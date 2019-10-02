@@ -1,0 +1,80 @@
+{
+  "pluginAlias": "Tion",
+  "pluginType": "platform",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Имя плагина",
+        "description": "Необходимо для корректной работы Homebridge",
+        "placeholder": "например, Tion",
+        "type": "string",
+        "default": "Tion",
+        "minLength": 1,
+        "required": true,
+        "validationMessages": {
+          "required": "Пожалуйста, укажите имя плагина"
+        }
+      },
+      "stationName": {
+        "title": "Имя базовой станции",
+        "description": "Если у вас одна базовая станция, оставьте это поле пустым. Если у вас несколько базовых станций, укажите имя той, что хотите добавить в Homekit",
+        "placeholder": "например, Дом",
+        "type": "string"
+      },
+      "userName": {
+        "title": "Email",
+        "description": "Необходим для входа в систему MagicAir",
+        "type": "string",
+        "minLength": 1,
+        "required": true,
+        "validationMessages": {
+          "required": "Пожалуйста, укажите email"
+        }
+      },
+      "password": {
+        "title": "Пароль",
+        "description": "Необходим для входа в систему MagicAir",
+        "type": "string",
+        "minLength": 1,
+        "required": true,
+        "validationMessages": {
+          "required": "Пожалуйста, укажите пароль"
+        }
+      },
+      "co2Threshold": {
+        "title": "Предельный уровень CO2",
+        "description": "Уровень CO2, выше которого будет сигнализировать датчик CO2 в Homekit",
+        "type": "integer",
+        "default": 800,
+        "minimum": 0,
+        "maximum": 2500
+      }
+    }
+  },
+  "layout": [
+    {
+      "type": "flex",
+      "flex-flow": "row wrap",
+      "items": [
+        "name",
+        "stationName"
+      ]
+    },
+    {
+      "type": "flex",
+      "flex-flow": "row wrap",
+      "items": [
+        "userName",
+        "password"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "expandable": true,
+      "title": "Дополнительно",
+      "items": ["co2Threshold"]
+    }
+  ]
+}
+  

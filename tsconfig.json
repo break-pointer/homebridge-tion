@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "strictNullChecks": true,
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "target": "ES6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "baseUrl": "./src/",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "plugins": [
+      { "transform": "ts-transformer-imports" }
+    ]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

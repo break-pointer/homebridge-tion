@@ -1,0 +1,72 @@
+{
+  "name": "homebridge-tion",
+  "version": "1.0.1",
+  "description": "Homebridge plugin to control Tion breezers",
+  "main": "./dist/index.js",
+  "scripts": {
+    "prettier": "prettier --write \"./src/**\"",
+    "dev": "tsc -w",
+    "type-check": "tsc --skipLibCheck",
+    "lint": "tslint './src/**/*.{ts,tsx}'",
+    "test": "jest",
+    "build": "ttsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/break-pointer/homebridge-tion.git"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "tion",
+    "o2",
+    "3s",
+    "breezer",
+    "air",
+    "purifier",
+    "co2",
+    "sensor",
+    "temperature",
+    "humidity"
+  ],
+  "author": "Ilya Ruzakov (ilya.ruzz@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/break-pointer/homebridge-tion/issues"
+  },
+  "homepage": "https://github.com/break-pointer/homebridge-tion#readme",
+  "engines": {
+    "node": ">=8.10.0",
+    "homebridge": ">=0.4.45"
+  },
+  "prettier": {
+    "printWidth": 120,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "semi": true,
+    "tabWidth": 4,
+    "bracketSpacing": false
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testEnvironment": "node"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.18",
+    "@types/node": "^12.7.4",
+    "jest": "^24.9.0",
+    "prettier": "^1.18.2",
+    "ts-jest": "^24.0.2",
+    "ts-transformer-imports": "^0.4.3",
+    "tslint": "^5.20.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "ttypescript": "^1.5.7",
+    "typescript": "^3.6.2"
+  },
+  "dependencies": {
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.7"
+  }
+}

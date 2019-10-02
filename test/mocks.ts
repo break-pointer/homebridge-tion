@@ -1,0 +1,271 @@
+import { ITionAuthStorage, ITionAuthData } from "../src/tion/auth";
+import { ITionPlatformConfig } from "../src/platform_config";
+import { IHomebridge, HomebridgePlatform, IHomebridgeApi } from "../src/homebridge/framework";
+import { EventEmitter } from "events";
+
+import {createHash} from 'crypto';
+
+export const MockLog = (...args) => console.log(...args);
+MockLog.debug  = MockLog;
+MockLog.info = MockLog;
+MockLog.warn = MockLog;
+MockLog.error = MockLog;
+MockLog.log = MockLog;
+
+export class MockTionAuthStorage implements ITionAuthStorage {
+     private auth = require('../__mocks__/data/auth.json');
+
+     public save = jest.fn(async (authData: ITionAuthData) => {
+          this.auth = authData;
+     })
+     
+     public load = jest.fn(async () => {
+          return this.auth;
+     })
+}
+
+export class MockPlatformConfig implements ITionPlatformConfig {
+     name: string;
+     stationName: string;
+     co2Threshold: number;
+     userName: string;
+     password: string;
+     
+     [key: string]: string | number;
+     constructor() {
+          this.stationName = 'Home';
+          this.userName = 'test';
+          this.password = 'test';
+          this.co2Threshold = 799;
+     }
+}
+
+export class MockPlatformAccessory {
+     private services: MockServiceBase[];
+
+     constructor () {
+          this.services = [];
+          this.services.push(new AccessoryInformation(""));
+     }
+
+     addService(service: typeof MockServiceBase, name: string): MockServiceBase {
+          const ret = new service(name);
+          this.services.push(ret);
+          return ret;
+     }
+
+     getService(sClass: typeof MockServiceBase): MockServiceBase {
+          const ret = this.services.find(s => s instanceof sClass);
+          if (!ret) {
+               throw new Error();
+          }
+          return ret;
+     }
+
+     on = jest.fn((event: string, callback: () => {}) => {})
+}
+
+class MockServiceBase {
+     name: string;
+     characteristics: MockCharacteristicBase[];
+     linkedServices: MockServiceBase[];
+
+     constructor(name: string) {
+          this.name = name;
+          this.characteristics = [];
+          this.linkedServices = [];
+     }
+
+     addCharacteristic(characteristic: typeof MockCharacteristicBase): MockServiceBase {
+          this.characteristics.push(new characteristic(""));
+          return this;
+     }
+
+     getCharacteristic(characteristic: typeof MockCharacteristicBase): MockCharacteristicBase {
+          let ret = this.characteristics.find(ch => ch instanceof characteristic);
+          if (!ret) {
+               ret = new characteristic("");
+               this.characteristics.push(ret);
+          }
+          return ret;
+     }
+
+     setCharacteristic(chClass: typeof MockCharacteristicBase, value: string | number): MockServiceBase {
+          const ret = this.getCharacteristic(chClass);
+          ret.value = value;
+          return this;
+     }
+
+     updateCharacteristic(chClass: typeof MockCharacteristicBase, value: string | number): MockServiceBase {
+          const ret = this.getCharacteristic(chClass);
+          ret.value = value;
+          return this;
+     }
+
+     addLinkedService(linkedService: MockServiceBase): void {
+          this.linkedServices.push(linkedService);
+     }
+}
+
+class AccessoryInformation extends MockServiceBase {
+}
+
+class CarbonDioxideSensor extends MockServiceBase {
+}
+
+class TemperatureSensor extends MockServiceBase {
+}
+
+class HumiditySensor extends MockServiceBase {
+}
+
+class AirPurifier extends MockServiceBase {
+}
+
+class FilterMaintenance extends MockServiceBase {
+}
+
+class HeaterCooler extends MockServiceBase {
+}
+
+class MockCharacteristicBase {
+     value: string | number;
+     events: {};
+     props: {};
+
+     constructor(value: string | number) {
+          this.value = value;
+          this.events = {};
+          this.props = {};
+     }
+ 
+     on(direction: 'get' | 'set', fn: any) {
+         this.events[direction] = fn;
+         return this;
+     }
+
+     setValue(value: string | number) {
+          this.value = value;
+     }
+
+     setProps(props) {
+          Object.assign(this.props, props);
+          return this;
+     }
+}
+
+class Manufacturer extends MockCharacteristicBase {
+}
+
+class Model extends MockCharacteristicBase {
+}
+
+class SerialNumber extends MockCharacteristicBase {
+}
+
+class FirmwareRevision extends MockCharacteristicBase {
+}
+
+class HardwareRevision extends MockCharacteristicBase {
+}
+
+class CarbonDioxideLevel extends MockCharacteristicBase {
+}
+
+class CarbonDioxideDetected extends MockCharacteristicBase {
+}
+
+class CurrentTemperature extends MockCharacteristicBase {
+}
+
+class CurrentRelativeHumidity extends MockCharacteristicBase {
+}
+
+class Active extends MockCharacteristicBase {
+}
+
+class CurrentAirPurifierState extends MockCharacteristicBase {
+}
+
+class TargetAirPurifierState extends MockCharacteristicBase {
+}
+
+class RotationSpeed extends MockCharacteristicBase {
+}
+
+class FilterChangeIndication extends MockCharacteristicBase {
+}
+
+class FilterLifeLevel extends MockCharacteristicBase {
+}
+
+class CurrentHeaterCoolerState extends MockCharacteristicBase {
+}
+
+class TargetHeaterCoolerState extends MockCharacteristicBase {
+}
+
+class HeatingThresholdTemperature extends MockCharacteristicBase {
+}
+
+export class MockHomebridge implements IHomebridge{
+     public hap = { 
+          Service: {
+               AccessoryInformation,
+               CarbonDioxideSensor,
+               TemperatureSensor,
+               HumiditySensor,
+               AirPurifier,
+               FilterMaintenance,
+               HeaterCooler
+          }, 
+          Characteristic: {
+               Manufacturer,
+               Model,
+               SerialNumber,
+               FirmwareRevision,
+               HardwareRevision,
+               CarbonDioxideLevel,
+               CarbonDioxideDetected,
+               CurrentTemperature,
+               CurrentRelativeHumidity,
+               Active,
+               CurrentAirPurifierState,
+               TargetAirPurifierState,
+               RotationSpeed,
+               FilterChangeIndication,
+               FilterLifeLevel,
+               CurrentHeaterCoolerState,
+               TargetHeaterCoolerState,
+               HeatingThresholdTemperature
+          },
+          uuid: {generate: (x: string) => createHash('md5').update(x).digest("hex")},
+     };
+     public user = {};
+
+     public platformAccessory = MockPlatformAccessory;
+
+     public registerPlatform = jest.fn((identifier: string, name: string, platform: typeof HomebridgePlatform, dynamic: boolean) => {
+     });
+}
+
+export class MockHomebridgeApi implements IHomebridgeApi {
+     private eventEmitter = new EventEmitter();
+
+     public registerPlatformAccessories = jest.fn((identifier: string, name: string, accessories: any[]) => {
+     })
+     public unregisterPlatformAccessories = jest.fn((identifier: string, name: string, accessories: any[]) => {
+     })
+
+     public on(eventName: string, callback: () => void) {
+          this.eventEmitter.on(eventName, callback);
+     }
+
+     public send(event: 'didFinishLaunching' | 'shutdown') {
+          this.eventEmitter.emit(event);
+     }
+
+     public clear() {
+          this.eventEmitter.removeAllListeners();
+     }
+}
