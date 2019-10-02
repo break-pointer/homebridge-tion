@@ -36,11 +36,11 @@
 
 2. Настройте базовую станцию:
 
-    Из [веб-интерфейса](https://magicair.tion.ru) или из приложения для [iOS](https://apps.apple.com/ru/app/magicair/id1111104830) или [Android](https://play.google.com/store/apps/details?id=com.tion.magicair)
+   Из [веб-интерфейса](https://magicair.tion.ru) или из приложения для [iOS](https://apps.apple.com/ru/app/magicair/id1111104830) или [Android](https://play.google.com/store/apps/details?id=com.tion.magicair)
 
 3. Обновите конфигурацию Homebridge:
 
-    Если вы уже установили [Config UI X](https://github.com/oznu/homebridge-config-ui-x), то достаточно добавить в секцию `platforms` следующую запись:
+   Если вы уже установили [Config UI X](https://github.com/oznu/homebridge-config-ui-x), то достаточно добавить в секцию `platforms` следующую запись:
     ```json
     "platforms": [
         {
@@ -50,8 +50,8 @@
    Остальные настройки вы сможете добавить со страницы в Config UI X:
 
 ![Настройки](docs/homebridge-tion-page.png)
-   
-    Если у вас нет [Config UI X](https://github.com/oznu/homebridge-config-ui-x), то надо добавить в секцию `platforms` следующую запись (см. описание полей ниже):
+
+   Если у вас нет [Config UI X](https://github.com/oznu/homebridge-config-ui-x), то надо добавить в секцию `platforms` следующую запись (см. описание полей ниже):
 
     ```json
     "platforms": [
