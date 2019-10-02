@@ -49,7 +49,7 @@
     ```
    Остальные настройки вы сможете добавить со страницы в Config UI X:
 
-![Настройки](docs/homebridge-tion-page.png)
+   ![Настройки](docs/homebridge-tion-page.png)
 
    Если у вас нет [Config UI X](https://github.com/oznu/homebridge-config-ui-x), то надо добавить в секцию `platforms` следующую запись (см. описание полей ниже):
 
@@ -66,6 +66,8 @@
     ```
 
 4. Перезапустите Homebridge
+
+   
 
 ## Конфигурация
 
