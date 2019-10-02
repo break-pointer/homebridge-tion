@@ -133,7 +133,7 @@ export class TionBreezer extends TionDeviceBase {
                 .on('set', async (value, callback) => {
                     try {
                         if (!this.isOn) {
-                            return callback('Off');
+                            return callback();
                         }
                         value = Boolean(value);
                         if (value !== this.isHeaterOn) {
@@ -182,7 +182,7 @@ export class TionBreezer extends TionDeviceBase {
                 .on('set', async (value, callback) => {
                     try {
                         if (!this.isOn) {
-                            return callback('Off');
+                            return callback();
                         }
                         if (value !== this.targetTemperature) {
                             await this.setState({
