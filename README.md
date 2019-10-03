@@ -28,30 +28,23 @@
 
 ## Установка
 
-1. Установите плагин:
+0. Настройте базовую станцию:
+
+   Из [веб-интерфейса](https://magicair.tion.ru) или из приложения для [iOS](https://apps.apple.com/ru/app/magicair/id1111104830) или [Android](https://play.google.com/store/apps/details?id=com.tion.magicair)
+
+1. Если у вас уже есть [Config UI X](https://github.com/oznu/homebridge-config-ui-x), рекомендую устанавливать и конфигурировать плагин с его помощью, а дальнейшие шаги можно пропустить.
+
+   ![Настройки](docs/homebridge-tion-page.png)
+
+2. Установите плагин:
 
     ```shell
     $ npm install -g homebridge-tion --production
     ```
 
-2. Настройте базовую станцию:
-
-   Из [веб-интерфейса](https://magicair.tion.ru) или из приложения для [iOS](https://apps.apple.com/ru/app/magicair/id1111104830) или [Android](https://play.google.com/store/apps/details?id=com.tion.magicair)
-
 3. Обновите конфигурацию Homebridge:
 
-   Если вы уже установили [Config UI X](https://github.com/oznu/homebridge-config-ui-x), то достаточно добавить в секцию `platforms` следующую запись:
-    ```json
-    "platforms": [
-        {
-            "platform": "Tion"
-        }
-    ```
-   Остальные настройки вы сможете добавить со страницы в Config UI X:
-
-   ![Настройки](docs/homebridge-tion-page.png)
-
-   Если у вас нет [Config UI X](https://github.com/oznu/homebridge-config-ui-x), то надо добавить в секцию `platforms` следующую запись (см. описание полей ниже):
+   Добавьте в секцию `platforms` следующую запись (см. описание полей ниже):
 
     ```json
     "platforms": [
@@ -74,7 +67,7 @@
 | Поле | Тип | Описание | Обязательно поле | Значение по-умолчанию |
 |--------|------|-------------|----------|---------------|
 | `name` | `string` | Имя плагина в Homebridge | Да | `Tion` |
-| `stationName` | `string` | Если у вас одна базовая станция, оставьте это поле пустым. Если у вас несколько базовых станций, укажите имя той, что хотите добавить в Homekit | Нет |  |
+| `stationName` | `string` | Если у вас одна базовая станция, оставьте это поле пустым. Если у вас несколько базовых станций, укажите имя _дома_ в MagicAir, где установлена станция | Нет |  |
 | `userName` | `string` | Имя пользователя в MagicAir | Да |  |
 | `password` | `string` | Пароль в MagicAir | Да |  |
 | `co2Threshold` | `number` | Уровень CO2, выше которого будет сигнализировать датчик CO2 в Homekit | Нет | `800` |

@@ -9,3 +9,4 @@ examples
 .npmignore
 tsconfig.json
 tslint.json
+*.tgz

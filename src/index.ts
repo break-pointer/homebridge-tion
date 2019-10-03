@@ -25,10 +25,23 @@ class TionPlatformWrapper extends HomebridgePlatform {
     constructor(log: ILog, config: ITionPlatformConfig, hbApi: IHomebridgeApi) {
         super(log, config, hbApi);
 
+        if (!log) {
+            throw new Error('Tion: log service not found. Probably incompatible Homebridge version');
+        }
+        if (!config || typeof config !== 'object') {
+            log.error('config not set, stopping platform');
+            return;
+        }
+        if (!hbApi) {
+            log.error('api service not found, probably incompatible Homebridge version, stopping platform');
+            return;
+        }
+
         if (!validate(log, sanitize(log, config))) {
             this.log.error('config invalid, stopping platform');
             return;
         }
+
         const authStorage = new TionFilesystemAuthStorage(log, User.persistPath());
         const authApi = new TionAuthApi(log, config, authStorage);
         const api = new TionApi(log, config, authApi);

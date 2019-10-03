@@ -56,6 +56,9 @@ export class TionBreezer extends TionDeviceBase {
                 .on('get', callback => this.getState(callback, () => (this.isOn ? 1 : 0)))
                 .on('set', async (value, callback) => {
                     try {
+                        if (!this.isOnline) {
+                            return callback('Not reachable');
+                        }
                         value = Boolean(value);
                         if (value !== this.isOn) {
                             await this.setState({
@@ -105,6 +108,9 @@ export class TionBreezer extends TionDeviceBase {
                 .on('get', callback => this.getState(callback, () => this.currentSpeed))
                 .on('set', async (value, callback) => {
                     try {
+                        if (!this.isOnline) {
+                            return callback('Not reachable');
+                        }
                         if (value && value !== this.currentSpeed) {
                             await this.setState({speed: value});
                         }
@@ -132,6 +138,9 @@ export class TionBreezer extends TionDeviceBase {
                 .on('get', callback => this.getState(callback, () => (this.isOn && this.isHeaterOn ? 1 : 0)))
                 .on('set', async (value, callback) => {
                     try {
+                        if (!this.isOnline) {
+                            return callback('Not reachable');
+                        }
                         if (!this.isOn) {
                             return callback();
                         }
@@ -181,6 +190,9 @@ export class TionBreezer extends TionDeviceBase {
                 .on('get', callback => this.getState(callback, () => this.targetTemperature))
                 .on('set', async (value, callback) => {
                     try {
+                        if (!this.isOnline) {
+                            return callback('Not reachable');
+                        }
                         if (!this.isOn) {
                             return callback();
                         }

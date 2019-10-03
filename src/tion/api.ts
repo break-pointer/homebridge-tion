@@ -61,7 +61,7 @@ export class TionApi implements ITionApi {
                 this.log.warn(`Location ${this.config.stationName} not found`);
             }
         }
-        return ret[0];
+        return ret.find(loc => loc.zones.length) || ret[0];
     }
 
     public async execCommand(deviceId: string, payload: ICommand): Promise<ICommandResult> {
@@ -74,7 +74,8 @@ export class TionApi implements ITionApi {
             );
             const commandId = result.task_id;
             this.log.debug(`TionApi.execCommand(commandId = ${commandId}, result = ${JSON.stringify(result)})`);
-            while (result.status !== 'completed') {
+            let attempts = 0;
+            while (result.status !== 'completed' && attempts++ < 4) {
                 switch (result.status) {
                     default:
                         this.log.error(`Unknown command status`);
@@ -83,7 +84,7 @@ export class TionApi implements ITionApi {
                         break;
                     case 'delivered':
                     case 'queued':
-                        // await new Promise((resolve) => setTimeout(resolve, 250));
+                        await new Promise(resolve => setTimeout(resolve, attempts * 100));
                         result = await this._internalRequest('get', `/task/${commandId}`, {json: true});
                         this.log.debug(`TionApi.execCommand(result = ${JSON.stringify(result)})`);
                         break;
@@ -91,15 +92,23 @@ export class TionApi implements ITionApi {
             }
             return result;
         } catch (err) {
-            this.log.error('Failed to execte command');
+            this.log.error('Failed to execute command');
+            this.wrapError(err);
             this.log.error(err);
             throw err;
+        }
+    }
+
+    private wrapError(err: any) {
+        if (err.response) {
+            err.response = undefined;
         }
     }
 
     private async _internalRequest(method: 'get' | 'post', endpoint: string, options: any = {}): Promise<any> {
         let accessToken = this.authApi.getAccessToken();
         let state: AuthState = accessToken ? AuthState.HasToken : AuthState.NoToken;
+        let internalServerErrorAttempts = 0;
         while (true) {
             switch (state) {
                 case AuthState.HasToken:
@@ -114,25 +123,32 @@ export class TionApi implements ITionApi {
                         return result;
                     } catch (err) {
                         if (err.statusCode === 401) {
-                            this.log.error('TionApi  token_expired:', err.message || err.statusCode);
+                            this.log.error('TionApi - token_expired: ', err.message || err.statusCode);
                             state = AuthState.TokenExpired;
+                        } else if (err.statusCode === 500 && internalServerErrorAttempts++ < 2) {
+                            this.log.error(`TionApi - got internal server error, retrying attempt ${internalServerErrorAttempts}:`, err.message || err.statusCode);
+                            await new Promise(resolve => setTimeout(resolve, internalServerErrorAttempts * 500));
                         } else {
+                            this.wrapError(err);
                             throw err;
                         }
                     }
                     break;
 
                 case AuthState.NoToken:
+                    internalServerErrorAttempts = 0;
                     try {
                         accessToken = await this.authApi.authenticateUsingPassword();
                         state = AuthState.HasToken;
                     } catch (err) {
                         this.log.error('TionApi - no_token:', err.message || err.statusCode);
+                        this.wrapError(err);
                         throw err;
                     }
                     break;
 
                 case AuthState.TokenExpired:
+                    internalServerErrorAttempts = 0;
                     try {
                         accessToken = await this.authApi.authenticateUsingRefreshToken();
                         state = AuthState.HasToken;
@@ -141,6 +157,7 @@ export class TionApi implements ITionApi {
                         if (err.statusCode >= 400 && err.statusCode < 500) {
                             state = AuthState.NoToken;
                         } else {
+                            this.wrapError(err);
                             throw err;
                         }
                     }

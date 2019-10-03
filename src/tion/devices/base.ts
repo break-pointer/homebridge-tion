@@ -80,17 +80,23 @@ export abstract class TionDeviceBase {
         }
     }
 
-    protected async getState(callback: (err: any, value: any) => any, getter: () => any): Promise<void> {
+    protected async getState(callback: (err: any, value?: any) => any, getter: () => any): Promise<void> {
         try {
             const state = await this.api.getSystemState();
             if (this.parseState(state)) {
+                if (!this.isOnline) {
+                    this.accessories.forEach(a => a.reachable = false);
+                    return callback('Not reachable');
+                }
+        
                 callback(null, getter());
             } else {
-                callback('Cannot parse state', undefined);
+                callback('Cannot parse state');
             }
         } catch (err) {
             this.log.error('Cannot get system state');
             this.log.error(err);
+            callback('Cannot get state');
         }
     }
 }
