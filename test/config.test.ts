@@ -7,6 +7,13 @@ describe('Test Platform Config', () => {
         const config = new MockPlatformConfig();
 
         expect(validate(MockLog, config)).toBeTruthy();
+        expect(sanitize(MockLog, config)).toEqual({
+            name: 'Tion',
+            homeName: 'Home',
+            userName: 'test',
+            password: 'test',
+            co2Threshold: 799
+,         });
     });
 
     test('Invalid config should not pass validation', () => {
@@ -20,7 +27,7 @@ describe('Test Platform Config', () => {
         const config = new MockPlatformConfig();
         Object.assign(config, {
             name: 123,
-            stationName: 123,
+            homeName: 123,
             userName: 123,
             password: 123,
             co2Threshold: -100

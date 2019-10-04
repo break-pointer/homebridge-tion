@@ -26,12 +26,12 @@ export class MockTionAuthStorage implements ITionAuthStorage {
 
 export class MockPlatformConfig implements ITionPlatformConfig {
      name: string;
-     stationName: string;
+     homeName: string;
+     stationName?: string;
      co2Threshold: number;
      userName: string;
      password: string;
-     
-     [key: string]: string | number;
+
      constructor() {
           this.stationName = 'Home';
           this.userName = 'test';

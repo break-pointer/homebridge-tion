@@ -18,7 +18,7 @@ export class TionBreezer extends TionDeviceBase {
     public filterChangeIndication: boolean;
     public filterLifeLevel: number;
 
-    public airIntake: number | undefined;
+    public airIntake?: number;
 
     private readonly maxSpeed: number;
     private readonly maxTargetTemperature: number;

@@ -27,7 +27,7 @@ export class TionApi implements ITionApi {
     private readonly authApi: ITionAuthApi;
     private readonly config: ITionPlatformConfig;
 
-    private stateRequest: Promise<ILocation[]> | null;
+    private stateRequest?: Promise<ILocation[]> | null;
 
     constructor(log: ILog, config: ITionPlatformConfig, authApi: ITionAuthApi) {
         this.log = log;
@@ -52,13 +52,13 @@ export class TionApi implements ITionApi {
         if (firstRequest) {
             this.stateRequest = null;
         }
-        if (this.config.stationName) {
-            const lower = this.config.stationName.toLowerCase();
+        if (this.config.homeName) {
+            const lower = this.config.homeName.toLowerCase();
             const location = ret.find(loc => loc.name.toLowerCase() === lower);
             if (location) {
                 return location;
             } else {
-                this.log.warn(`Location ${this.config.stationName} not found`);
+                this.log.warn(`Location ${this.config.homeName} not found, using first appropriate`);
             }
         }
         return ret.find(loc => loc.zones.length) || ret[0];

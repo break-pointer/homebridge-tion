@@ -5,12 +5,11 @@ export const PlatformName = 'Tion';
 
 export interface ITionPlatformConfig extends IHomebridgePlatformConfig {
     name: string;
-    stationName: string;
+    stationName?: string; // deprecated since 1.0.4
+    homeName: string;
     userName: string;
     password: string;
     co2Threshold: number;
-
-    [key: string]: number | string;
 }
 
 export function validate(log: ILog, config: ITionPlatformConfig): boolean {
@@ -27,9 +26,16 @@ export function sanitize(log: ILog, config: ITionPlatformConfig): ITionPlatformC
         log.warn(`config.name has incompatible value, setting "Tion"`);
         Object.assign(config, {name: 'Tion'});
     }
-    if ('stationName' in config && typeof config.stationName !== 'string') {
-        log.warn(`config.stationName has incompatible value, removing`);
+    if (config.stationName) {
+        if (!config.homeName) {
+            config.homeName = config.stationName;
+        }
+
         delete config.stationName;
+    }
+    if ('homeName' in config && typeof config.homeName !== 'string') {
+        log.warn(`config.homeName has incompatible value, removing`);
+        delete config.homeName;
     }
     if ('userName' in config && typeof config.userName !== 'string') {
         log.warn(`config.userName has incompatible value, removing`);
