@@ -27,14 +27,12 @@ export class TionApi implements ITionApi {
     private readonly authApi: ITionAuthApi;
     private readonly config: ITionPlatformConfig;
 
-    private stateRequest?: Promise<ILocation[]> | null;
+    private stateRequest?: Promise<ILocation[]>;
 
     constructor(log: ILog, config: ITionPlatformConfig, authApi: ITionAuthApi) {
         this.log = log;
         this.config = config;
         this.authApi = authApi;
-
-        this.stateRequest = null;
     }
 
     public async init(): Promise<any> {
@@ -48,20 +46,24 @@ export class TionApi implements ITionApi {
             this.stateRequest = this._internalRequest('get', '/location', {json: true});
             firstRequest = true;
         }
-        const ret = await this.stateRequest;
-        if (firstRequest) {
-            this.stateRequest = null;
+        let stateResult;
+        try {
+            stateResult = await this.stateRequest;
+        } finally {
+            if (firstRequest) {
+                this.stateRequest = undefined;
+            }
         }
         if (this.config.homeName) {
             const lower = this.config.homeName.toLowerCase();
-            const location = ret.find(loc => loc.name.toLowerCase() === lower);
+            const location = stateResult.find(loc => loc.name.toLowerCase() === lower);
             if (location) {
                 return location;
             } else {
                 this.log.warn(`Location ${this.config.homeName} not found, using first appropriate`);
             }
         }
-        return ret.find(loc => loc.zones.length) || ret[0];
+        return stateResult.find(loc => loc.zones.length) || stateResult[0];
     }
 
     public async execCommand(deviceId: string, payload: ICommand): Promise<ICommandResult> {

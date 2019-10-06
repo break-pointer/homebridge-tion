@@ -1,6 +1,6 @@
 {
   "name": "homebridge-tion",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Homebridge plugin to control Tion breezers",
   "main": "./dist/index.js",
   "scripts": {
@@ -39,6 +39,7 @@
     "homebridge": ">=0.4.45"
   },
   "prettier": {
+    "filepath": "./src/*",
     "printWidth": 120,
     "singleQuote": true,
     "trailingComma": "es5",
