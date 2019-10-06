@@ -99,4 +99,13 @@ export abstract class TionDeviceBase {
             callback('Cannot get state');
         }
     }
+
+    protected rollbackCharacteristic(service: any, characteristic: any, value: string | number | boolean) {
+        setTimeout(() => {
+            service.updateCharacteristic(
+                characteristic, 
+                value
+            );
+        }, 100);
+    }
 }

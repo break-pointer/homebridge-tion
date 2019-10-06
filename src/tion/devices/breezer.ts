@@ -114,7 +114,14 @@ export class TionBreezer extends TionDeviceBase {
                         if (value && value !== this.currentSpeed) {
                             await this.setState({speed: value});
                         }
-                        this.currentSpeed = value;
+                        this.currentSpeed = value || 1;
+                        if (this.currentSpeed !== value) {
+                            this.rollbackCharacteristic(
+                                airPurifier,
+                                this.characteristicRegistry.RotationSpeed,
+                                this.currentSpeed
+                            );
+                        }
                         callback();
                     } catch (err) {
                         callback(err.message || err);
@@ -142,6 +149,11 @@ export class TionBreezer extends TionDeviceBase {
                             return callback('Not reachable');
                         }
                         if (!this.isOn) {
+                            this.rollbackCharacteristic(
+                                heater, 
+                                this.characteristicRegistry.Active,
+                                0
+                            );
                             return callback();
                         }
                         value = Boolean(value);
@@ -156,7 +168,7 @@ export class TionBreezer extends TionDeviceBase {
                                 gate: this.airIntake,
                             });
                         }
-                        this.isHeaterOn = Boolean(value);
+                        this.isHeaterOn = value;
                         callback();
                     } catch (err) {
                         callback(err.message || err);
@@ -194,6 +206,11 @@ export class TionBreezer extends TionDeviceBase {
                             return callback('Not reachable');
                         }
                         if (!this.isOn) {
+                            this.rollbackCharacteristic(
+                                heater,
+                                this.characteristicRegistry.HeatingThresholdTemperature,
+                                this.targetTemperature
+                            );
                             return callback();
                         }
                         if (value !== this.targetTemperature) {
@@ -269,8 +286,8 @@ export class TionBreezer extends TionDeviceBase {
         this.isOnline = device.is_online;
 
         this.isOn = device.data.is_on || false;
-        this.currentSpeed = device.data.speed || 0;
-        this.speedLimit = device.data.speed_limit || 0;
+        this.currentSpeed = device.data.speed || 1;
+        this.speedLimit = device.data.speed_limit || this.maxSpeed;
 
         if (this.isHeaterInstalled) {
             this.isHeaterOn = device.data.heater_enabled || false;

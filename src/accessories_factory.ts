@@ -108,7 +108,7 @@ export class AccessoriesFactory implements IAccessoriesFactory {
             .setCharacteristic(this.characteristicRegistry.Active, 0)
             .setCharacteristic(this.characteristicRegistry.CurrentAirPurifierState, 0)
             .setCharacteristic(this.characteristicRegistry.TargetAirPurifierState, 1)
-            .setCharacteristic(this.characteristicRegistry.RotationSpeed, 0);
+            .setCharacteristic(this.characteristicRegistry.RotationSpeed, 1);
 
         const filter = accessory
             .addService(this.serviceRegistry.FilterMaintenance, 'Фильтр')
