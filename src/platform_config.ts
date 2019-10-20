@@ -10,6 +10,7 @@ export interface ITionPlatformConfig extends IHomebridgePlatformConfig {
     userName: string;
     password: string;
     co2Threshold: number;
+    apiRequestTimeout: number;
 }
 
 export function validate(log: ILog, config: ITionPlatformConfig): boolean {
@@ -52,6 +53,14 @@ export function sanitize(log: ILog, config: ITionPlatformConfig): ITionPlatformC
         }
     } else {
         Object.assign(config, {co2Threshold: 800});
+    }
+    if ('apiRequestTimeout' in config) {
+        if (!Number.isInteger(config.apiRequestTimeout) || config.apiRequestTimeout < 1000 || config.apiRequestTimeout > 30000) {
+            log.warn(`config.apiRequestTimeout has incompatible value, setting 1500`);
+            Object.assign(config, {apiRequestTimeout: 1500});
+        }
+    } else {
+        Object.assign(config, {apiRequestTimeout: 1500});
     }
     return config;
 }

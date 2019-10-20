@@ -1,3 +1,5 @@
+import {CoreOptions as RequestOptions} from 'request';
+
 import request from 'request-promise-native';
 
 import {ILog} from 'homebridge/framework';
@@ -43,7 +45,11 @@ export class TionApi implements ITionApi {
         let firstRequest = false;
         if (!this.stateRequest) {
             this.log.debug('Loading system state');
-            this.stateRequest = this._internalRequest('get', '/location', {json: true});
+            this.stateRequest = this._internalRequest(
+                'get', 
+                '/location', 
+                {json: true, timeout: this.config.apiRequestTimeout}
+            );
             firstRequest = true;
         }
         let stateResult;
@@ -72,7 +78,7 @@ export class TionApi implements ITionApi {
             let result: ICommandResult = await this._internalRequest(
                 'post', 
                 `/device/${deviceId}/mode`, 
-                {body: payload, json: true}
+                {body: payload, json: true, timeout: this.config.apiRequestTimeout}
             );
             const commandId = result.task_id;
             this.log.debug(`TionApi.execCommand(commandId = ${commandId}, result = ${JSON.stringify(result)})`);
@@ -87,7 +93,11 @@ export class TionApi implements ITionApi {
                     case 'delivered':
                     case 'queued':
                         await new Promise(resolve => setTimeout(resolve, attempts * 100));
-                        result = await this._internalRequest('get', `/task/${commandId}`, {json: true});
+                        result = await this._internalRequest(
+                            'get', 
+                            `/task/${commandId}`, 
+                            {json: true, timeout: this.config.apiRequestTimeout}
+                        );
                         this.log.debug(`TionApi.execCommand(result = ${JSON.stringify(result)})`);
                         break;
                 }
@@ -107,7 +117,7 @@ export class TionApi implements ITionApi {
         }
     }
 
-    private async _internalRequest(method: 'get' | 'post', endpoint: string, options: any = {}): Promise<any> {
+    private async _internalRequest(method: 'get' | 'post', endpoint: string, options: RequestOptions): Promise<any> {
         let accessToken = this.authApi.getAccessToken();
         let state: AuthState = accessToken ? AuthState.HasToken : AuthState.NoToken;
         let internalServerErrorAttempts = 0;
@@ -127,8 +137,9 @@ export class TionApi implements ITionApi {
                         if (err.statusCode === 401) {
                             this.log.error('TionApi - token_expired: ', err.message || err.statusCode);
                             state = AuthState.TokenExpired;
-                        } else if (err.statusCode === 500 && internalServerErrorAttempts++ < 2) {
-                            this.log.error(`TionApi - got internal server error, retrying attempt ${internalServerErrorAttempts}:`, err.message || err.statusCode);
+                        } else if ((err.statusCode === 500 || (err.cause && err.cause.message === 'ESOCKETTIMEDOUT')) 
+                                    && internalServerErrorAttempts++ < 2) {
+                            this.log.error(`TionApi - got internal server error or timeout, retrying attempt ${internalServerErrorAttempts}:`, err.message || err.statusCode);
                             await new Promise(resolve => setTimeout(resolve, internalServerErrorAttempts * 500));
                         } else {
                             this.wrapError(err);
