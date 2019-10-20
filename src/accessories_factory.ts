@@ -84,18 +84,18 @@ export class AccessoriesFactory implements IAccessoriesFactory {
         const ret: IHomebridgeAccessory[] = [];
         const Accessory = this.accessoryClass;
 
-        const accessory: IHomebridgeAccessory = new Accessory(device.name, this.generateUuid(device.id));
-        accessory.context = {
+        const breezerAccessory: IHomebridgeAccessory = new Accessory(device.name, this.generateUuid(device.id));
+        breezerAccessory.context = {
             id: device.id,
         };
 
-        accessory.on('identify', (paired, callback) => {
+        breezerAccessory.on('identify', (paired, callback) => {
             this.log.info(`Identify ${device.id}`);
 
             callback();
         });
 
-        accessory
+        breezerAccessory
             .getService(this.serviceRegistry.AccessoryInformation)
             .setCharacteristic(this.characteristicRegistry.Manufacturer, 'Tion')
             .setCharacteristic(this.characteristicRegistry.Model, device.modelName)
@@ -103,14 +103,14 @@ export class AccessoriesFactory implements IAccessoriesFactory {
             .setCharacteristic(this.characteristicRegistry.FirmwareRevision, device.firmwareRevision)
             .setCharacteristic(this.characteristicRegistry.HardwareRevision, device.hardwareRevision);
 
-        const airPurifier = accessory
+        const airPurifier = breezerAccessory
             .addService(this.serviceRegistry.AirPurifier, 'Приток')
             .setCharacteristic(this.characteristicRegistry.Active, 0)
             .setCharacteristic(this.characteristicRegistry.CurrentAirPurifierState, 0)
             .setCharacteristic(this.characteristicRegistry.TargetAirPurifierState, 1)
             .setCharacteristic(this.characteristicRegistry.RotationSpeed, 1);
 
-        const filter = accessory
+        const filter = breezerAccessory
             .addService(this.serviceRegistry.FilterMaintenance, 'Фильтр')
             .setCharacteristic(this.characteristicRegistry.FilterChangeIndication, 0)
             .setCharacteristic(this.characteristicRegistry.FilterLifeLevel, 0);
@@ -118,7 +118,7 @@ export class AccessoriesFactory implements IAccessoriesFactory {
         airPurifier.addLinkedService(filter);
 
         if (device.isHeaterInstalled) {
-            accessory
+            breezerAccessory
                 .addService(this.serviceRegistry.HeaterCooler, 'Нагрев')
                 .setCharacteristic(this.characteristicRegistry.Active, 0)
                 .setCharacteristic(this.characteristicRegistry.CurrentHeaterCoolerState, 0)
@@ -127,7 +127,27 @@ export class AccessoriesFactory implements IAccessoriesFactory {
                 .setCharacteristic(this.characteristicRegistry.HeatingThresholdTemperature, 0);
         }
 
-        ret.push(accessory);
+        ret.push(breezerAccessory);
+
+        const tempSensorAccessory: IHomebridgeAccessory = new Accessory(device.name, this.generateUuid(`${device.id}:outside_temperature`));
+        tempSensorAccessory.context = {
+            id: device.id,
+        };
+
+        tempSensorAccessory
+            .getService(this.serviceRegistry.AccessoryInformation)
+            .setCharacteristic(this.characteristicRegistry.Manufacturer, 'Tion')
+            .setCharacteristic(this.characteristicRegistry.Model, device.modelName)
+            .setCharacteristic(this.characteristicRegistry.SerialNumber, device.mac)
+            .setCharacteristic(this.characteristicRegistry.FirmwareRevision, device.firmwareRevision)
+            .setCharacteristic(this.characteristicRegistry.HardwareRevision, device.hardwareRevision);
+
+
+        tempSensorAccessory.addService(this.serviceRegistry.TemperatureSensor, 'Температура уличного воздуха')
+            .setCharacteristic(this.characteristicRegistry.StatusActive, 0)
+            .setCharacteristic(this.characteristicRegistry.CurrentTemperature, 0);
+
+        ret.push(tempSensorAccessory);
 
         return ret;
     }

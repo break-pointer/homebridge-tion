@@ -12,7 +12,8 @@ describe('Test Platform Config', () => {
             homeName: 'Home',
             userName: 'test',
             password: 'test',
-            co2Threshold: 799
+            co2Threshold: 799,
+            apiRequestTimeout: 1001
 ,         });
     });
 
@@ -30,12 +31,14 @@ describe('Test Platform Config', () => {
             homeName: 123,
             userName: 123,
             password: 123,
-            co2Threshold: -100
-        })
+            co2Threshold: -100,
+            apiRequestTimeout: 0
+        });
 
         expect(sanitize(MockLog, config)).toEqual({
             name: 'Tion',
-            co2Threshold: 800
+            co2Threshold: 800,
+            apiRequestTimeout: 1500
         });
     });
 });

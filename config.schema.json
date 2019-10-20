@@ -43,12 +43,20 @@
         }
       },
       "co2Threshold": {
-        "title": "Предельный уровень CO2",
+        "title": "Предельный уровень CO2, ppm",
         "description": "Уровень CO2, выше которого будет сигнализировать датчик CO2 в Homekit",
         "type": "integer",
         "default": 800,
         "minimum": 0,
         "maximum": 2500
+      },
+      "apiRequestTimeout": {
+        "title": "Таймаут запросов к серверу MagiAir, мс",
+        "description": "Таймаут, по истечении которого запрос к серверу MagicAir принудительно завершается с ошибкой ",
+        "type": "integer",
+        "default": 1500,
+        "minimum": 1000,
+        "maximum": 30000
       }
     }
   },
@@ -73,7 +81,7 @@
       "type": "fieldset",
       "expandable": true,
       "title": "Дополнительно",
-      "items": ["co2Threshold"]
+      "items": ["co2Threshold", "apiRequestTimeout"]
     }
   ]
 }
