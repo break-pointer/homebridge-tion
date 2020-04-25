@@ -45,11 +45,10 @@ export class TionApi implements ITionApi {
         let firstRequest = false;
         if (!this.stateRequest) {
             this.log.debug('Loading system state');
-            this.stateRequest = this._internalRequest(
-                'get', 
-                '/location', 
-                {json: true, timeout: this.config.apiRequestTimeout}
-            );
+            this.stateRequest = this._internalRequest('get', '/location', {
+                json: true,
+                timeout: this.config.apiRequestTimeout,
+            });
             firstRequest = true;
         }
         let stateResult;
@@ -60,26 +59,29 @@ export class TionApi implements ITionApi {
                 this.stateRequest = undefined;
             }
         }
+        let ret: ILocation;
         if (this.config.homeName) {
             const lower = this.config.homeName.toLowerCase();
             const location = stateResult.find(loc => loc.name.toLowerCase() === lower);
             if (location) {
-                return location;
+                ret = location;
             } else {
-                this.log.warn(`Location ${this.config.homeName} not found, using first appropriate`);
+                this.log.warn(`Location ${this.config.homeName} not found, using first suitable`);
             }
         }
-        return stateResult.find(loc => loc.zones.length) || stateResult[0];
+        ret = stateResult.find(loc => loc.zones.length) || stateResult[0];
+
+        return ret;
     }
 
     public async execCommand(deviceId: string, payload: ICommand): Promise<ICommandResult> {
         this.log.debug(`TionApi.execCommand(deviceId = ${deviceId}, payload = ${JSON.stringify(payload)})`);
         try {
-            let result: ICommandResult = await this._internalRequest(
-                'post', 
-                `/device/${deviceId}/mode`, 
-                {body: payload, json: true, timeout: this.config.apiRequestTimeout}
-            );
+            let result: ICommandResult = await this._internalRequest('post', `/device/${deviceId}/mode`, {
+                body: payload,
+                json: true,
+                timeout: this.config.apiRequestTimeout,
+            });
             const commandId = result.task_id;
             this.log.debug(`TionApi.execCommand(commandId = ${commandId}, result = ${JSON.stringify(result)})`);
             let attempts = 0;
@@ -93,11 +95,10 @@ export class TionApi implements ITionApi {
                     case 'delivered':
                     case 'queued':
                         await new Promise(resolve => setTimeout(resolve, attempts * 100));
-                        result = await this._internalRequest(
-                            'get', 
-                            `/task/${commandId}`, 
-                            {json: true, timeout: this.config.apiRequestTimeout}
-                        );
+                        result = await this._internalRequest('get', `/task/${commandId}`, {
+                            json: true,
+                            timeout: this.config.apiRequestTimeout,
+                        });
                         this.log.debug(`TionApi.execCommand(result = ${JSON.stringify(result)})`);
                         break;
                 }
@@ -137,9 +138,14 @@ export class TionApi implements ITionApi {
                         if (err.statusCode === 401) {
                             this.log.error('TionApi - token_expired: ', err.message || err.statusCode);
                             state = AuthState.TokenExpired;
-                        } else if ((err.statusCode === 500 || (err.cause && err.cause.message === 'ESOCKETTIMEDOUT')) 
-                                    && internalServerErrorAttempts++ < 2) {
-                            this.log.error(`TionApi - got internal server error or timeout, retrying attempt ${internalServerErrorAttempts}:`, err.message || err.statusCode);
+                        } else if (
+                            (err.statusCode === 500 || (err.cause && err.cause.message === 'ESOCKETTIMEDOUT')) &&
+                            internalServerErrorAttempts++ < 2
+                        ) {
+                            this.log.error(
+                                `TionApi - got internal server error or timeout, retrying attempt ${internalServerErrorAttempts}:`,
+                                err.message || err.statusCode
+                            );
                             await new Promise(resolve => setTimeout(resolve, internalServerErrorAttempts * 500));
                         } else {
                             this.wrapError(err);

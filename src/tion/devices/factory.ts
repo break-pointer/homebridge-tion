@@ -6,11 +6,13 @@ import {ITionApi} from 'tion/api';
 import {TionDeviceBase} from './base';
 import {TionMagicAirStation} from './station';
 import {TionBreezer} from './breezer';
+import {TionCO2Plus} from './co2plus';
 
 enum SupportedDeviceTypes {
     MagicAirStation = 'co2mb',
     Breezer3S = 'breezer3',
     BreezerO2 = 'tionO2Rf',
+    CO2Plus = 'co2Plus',
 }
 
 export interface ITionDevicesFactory {
@@ -72,6 +74,15 @@ export class TionDevicesFactory implements ITionDevicesFactory {
             case SupportedDeviceTypes.Breezer3S:
             case SupportedDeviceTypes.BreezerO2:
                 return new TionBreezer(
+                    device,
+                    this.log,
+                    this.config,
+                    this.api,
+                    this.serviceRegistry,
+                    this.characteristicRegistry
+                );
+            case SupportedDeviceTypes.CO2Plus:
+                return new TionCO2Plus(
                     device,
                     this.log,
                     this.config,

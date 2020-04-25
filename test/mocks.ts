@@ -56,10 +56,10 @@ export class MockPlatformAccessory {
         return ret;
     }
 
-    getService(sClass: typeof MockServiceBase): MockServiceBase {
+    getService(sClass: typeof MockServiceBase): MockServiceBase | undefined {
         const ret = this.services.find(s => s instanceof sClass);
         if (!ret) {
-            throw new Error();
+            console.log(`Accessory ${this} is being requested service ${sClass}, but none registered`);
         }
         return ret;
     }
@@ -86,8 +86,13 @@ class MockServiceBase {
     getCharacteristic(characteristic: typeof MockCharacteristicBase): MockCharacteristicBase {
         let ret = this.characteristics.find(ch => ch instanceof characteristic);
         if (!ret) {
-            ret = new characteristic("");
-            this.characteristics.push(ret);
+            try {
+                ret = new characteristic("");
+                this.characteristics.push(ret);
+            } catch (err) {
+                console.log(characteristic);
+                throw new Error(`No characteristic ${characteristic}`);
+            }
         }
         return ret;
     }
@@ -186,6 +191,9 @@ class CurrentRelativeHumidity extends MockCharacteristicBase {
 class Active extends MockCharacteristicBase {
 }
 
+class StatusActive extends MockCharacteristicBase {
+}
+
 class CurrentAirPurifierState extends MockCharacteristicBase {
 }
 
@@ -232,6 +240,7 @@ export class MockHomebridge implements IHomebridge{
             CurrentTemperature,
             CurrentRelativeHumidity,
             Active,
+            StatusActive,
             CurrentAirPurifierState,
             TargetAirPurifierState,
             RotationSpeed,

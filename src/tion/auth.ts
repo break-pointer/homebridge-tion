@@ -111,17 +111,17 @@ export class TionFilesystemAuthStorage implements ITionAuthStorage {
 
     public async save(authData: ITionAuthData): Promise<void> {
         fs.writeFileSync(this.getStatePath(), JSON.stringify(authData, null, 4), {encoding: 'utf8'});
-        this.log.info('Auth tokens persisted');
+        this.log.debug('Auth tokens persisted');
     }
 
     public async load(): Promise<ITionAuthData> {
         try {
             const text = fs.readFileSync(this.getStatePath(), {encoding: 'utf8'});
             const ret = JSON.parse(text);
-            this.log.info('Got persisted auth tokens');
+            this.log.debug('Got persisted auth tokens');
             return ret;
         } catch (err) {
-            this.log.info('Auth tokens not persisted');
+            this.log.debug('Auth tokens not persisted');
             throw err;
         }
     }

@@ -22,6 +22,7 @@ export class TionBreezer extends TionDeviceBase {
 
     private readonly maxSpeed: number;
     private readonly maxTargetTemperature: number;
+    private firstParse: boolean;
 
     constructor(
         device: IDevice,
@@ -33,9 +34,24 @@ export class TionBreezer extends TionDeviceBase {
     ) {
         super(device, log, config, api, serviceRegistry, characteristicRegistry);
 
+        this.isOn = false;
+        this.currentSpeed = 0;
+        this.speedLimit = device.max_speed || 0;
+
         this.isHeaterInstalled = device.data.heater_installed || false;
+        this.isHeaterOn = false;
+        this.targetTemperature = 22;
+        this.currentTemperature = 22;
+        this.outsideTemperature = 22;
+        
+        this.filterChangeIndication = false;
+        this.filterLifeLevel = 1;
+        
+        this.airIntake = 0;
+        
         this.maxSpeed = device.max_speed || 0;
         this.maxTargetTemperature = device.t_max || 0;
+        this.firstParse = true;
     }
 
     public addEventHandlers(accessory: IHomebridgeAccessory): void {
@@ -58,6 +74,7 @@ export class TionBreezer extends TionDeviceBase {
                 .on('set', async (value, callback) => {
                     try {
                         if (!this.isOnline) {
+                            this.log.error(`Device ${this.name} (${this.id}) not reachable`);
                             return callback('Not reachable');
                         }
                         value = Boolean(value);
@@ -83,6 +100,7 @@ export class TionBreezer extends TionDeviceBase {
                         );
                         callback();
                     } catch (err) {
+                        this.log.error(err.message || err);
                         callback(err.message || err);
                     }
                 });
@@ -104,12 +122,13 @@ export class TionBreezer extends TionDeviceBase {
                 .getCharacteristic(this.characteristicRegistry.RotationSpeed)
                 .setProps({
                     minValue: 0,
-                    maxValue: Math.min(this.maxSpeed),
+                    maxValue: Math.min(this.speedLimit, this.maxSpeed),
                 })
                 .on('get', callback => this.getState(callback, () => this.currentSpeed))
                 .on('set', async (value, callback) => {
                     try {
                         if (!this.isOnline) {
+                            this.log.error(`Device ${this.name} (${this.id}) not reachable`);
                             return callback('Not reachable');
                         }
                         if (value && value !== this.currentSpeed) {
@@ -125,6 +144,7 @@ export class TionBreezer extends TionDeviceBase {
                         }
                         callback();
                     } catch (err) {
+                        this.log.error(err.message || err);
                         callback(err.message || err);
                     }
                 });
@@ -147,6 +167,7 @@ export class TionBreezer extends TionDeviceBase {
                 .on('set', async (value, callback) => {
                     try {
                         if (!this.isOnline) {
+                            this.log.error(`Device ${this.name} (${this.id}) not reachable`);
                             return callback('Not reachable');
                         }
                         if (!this.isOn) {
@@ -172,6 +193,7 @@ export class TionBreezer extends TionDeviceBase {
                         this.isHeaterOn = value;
                         callback();
                     } catch (err) {
+                        this.log.error(err.message || err);
                         callback(err.message || err);
                     }
                 });
@@ -204,6 +226,7 @@ export class TionBreezer extends TionDeviceBase {
                 .on('set', async (value, callback) => {
                     try {
                         if (!this.isOnline) {
+                            this.log.error(`Device ${this.name} (${this.id}) not reachable`);
                             return callback('Not reachable');
                         }
                         if (!this.isOn) {
@@ -228,6 +251,7 @@ export class TionBreezer extends TionDeviceBase {
                         this.targetTemperature = value;
                         callback();
                     } catch (err) {
+                        this.log.error(err.message || err);
                         callback(err.message || err);
                     }
                 });
@@ -238,8 +262,12 @@ export class TionBreezer extends TionDeviceBase {
                 .getCharacteristic(this.characteristicRegistry.StatusActive)
                 .on('get', callback => this.getState(callback, () => this.isOn ? 1 : 0));
 
-                outsideTemperature
+            outsideTemperature
                 .getCharacteristic(this.characteristicRegistry.CurrentTemperature)
+                .setProps({
+                    minValue: -100,
+                    maxValue: 100,
+                })
                 .on('get', callback => this.getState(callback, () => this.outsideTemperature));
         }
     }
@@ -291,7 +319,7 @@ export class TionBreezer extends TionDeviceBase {
                 outsideTemperature[action](this.characteristicRegistry.StatusActive, this.isOn ? 1 : 0);
                 outsideTemperature[action](
                     this.characteristicRegistry.CurrentTemperature, 
-                    this.isOn ? this.outsideTemperature : this.currentTemperature
+                    this.outsideTemperature
                 );
             }
         });
@@ -315,7 +343,7 @@ export class TionBreezer extends TionDeviceBase {
             this.currentTemperature = device.data.t_out || 0;
         }
 
-        if (this.isOn) {
+        if (this.isOn && this.firstParse) {
             this.outsideTemperature = device.data.t_in || 0;
         }
 
@@ -325,6 +353,8 @@ export class TionBreezer extends TionDeviceBase {
             : 0;
 
         this.airIntake = device.data.gate;
+
+        this.firstParse = false;
 
         return true;
     }

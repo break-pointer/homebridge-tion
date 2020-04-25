@@ -36,6 +36,8 @@ export abstract class TionDeviceBase {
         this.mac = device.mac;
         this.firmwareRevision = device.firmware;
         this.hardwareRevision = device.hardware;
+        this.isOnline = true;
+        this.isCommandRunning = false;
 
         this.log = log;
         this.config = config;
@@ -66,7 +68,7 @@ export abstract class TionDeviceBase {
             });
         });
         if (!ret) {
-            this.log.warn(`Device ${this.name} (${this.id}) not found in remote state`);
+            this.log.error(`Device ${this.name} (${this.id}) not found in remote state`);
         }
         return ret;
     }
@@ -86,11 +88,13 @@ export abstract class TionDeviceBase {
             if (this.parseState(state)) {
                 if (!this.isOnline) {
                     this.accessories.forEach(a => a.reachable = false);
+                    this.log.error(`Device ${this.name} (${this.id}) not reachable`);
                     return callback('Not reachable');
                 }
         
                 callback(null, getter());
             } else {
+                this.log.error(`Device ${this.name} (${this.id}) cannot parse state`);
                 callback('Cannot parse state');
             }
         } catch (err) {
