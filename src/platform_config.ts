@@ -55,7 +55,11 @@ export function sanitize(log: ILog, config: ITionPlatformConfig): ITionPlatformC
         Object.assign(config, {co2Threshold: 800});
     }
     if ('apiRequestTimeout' in config) {
-        if (!Number.isInteger(config.apiRequestTimeout) || config.apiRequestTimeout < 1000 || config.apiRequestTimeout > 30000) {
+        if (
+            !Number.isInteger(config.apiRequestTimeout) ||
+            config.apiRequestTimeout < 1000 ||
+            config.apiRequestTimeout > 30000
+        ) {
             log.warn(`config.apiRequestTimeout has incompatible value, setting 1500`);
             Object.assign(config, {apiRequestTimeout: 1500});
         }

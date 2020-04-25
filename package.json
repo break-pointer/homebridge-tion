@@ -1,6 +1,6 @@
 {
   "name": "homebridge-tion",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Homebridge plugin to control Tion breezers",
   "main": "./dist/index.js",
   "scripts": {
@@ -53,11 +53,17 @@
     },
     "testEnvironment": "node"
   },
+  "config": {
+    "ghooks": {
+      "pre-commit": "npm run type-check && npm run lint && npm run test"
+    }
+  },
   "devDependencies": {
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.4",
     "@types/request": "^2.48.3",
     "@types/request-promise-native": "^1.0.17",
+    "ghooks": "^2.0.4",
     "jest": "^24.9.0",
     "prettier": "^1.18.2",
     "ts-jest": "^24.0.2",

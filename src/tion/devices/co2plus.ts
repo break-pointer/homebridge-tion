@@ -2,7 +2,7 @@ import {IHomebridgeAccessory} from 'homebridge/framework';
 import {TionDeviceBase} from './base';
 import {ILocation, IDevice} from 'tion/state';
 
-export class TionMagicAirStation extends TionDeviceBase {
+export class TionCO2Plus extends TionDeviceBase {
     public co2Level: number = 0;
     public temperature: number = 0;
     public humidity: number = 0;

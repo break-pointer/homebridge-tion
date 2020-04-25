@@ -3,6 +3,7 @@ import {ILog, IHomebridgeAccessory, UuidGen} from './homebridge/framework';
 import {TionDeviceBase} from './tion/devices/base';
 import {TionMagicAirStation} from './tion/devices/station';
 import {TionBreezer} from './tion/devices/breezer';
+import {TionCO2Plus} from './tion/devices/co2plus';
 
 export interface IAccessoriesFactory {
     createAccessories(device: TionDeviceBase): IHomebridgeAccessory[];
@@ -34,6 +35,8 @@ export class AccessoriesFactory implements IAccessoriesFactory {
             return this.createMagicAirStationAccessories(device);
         } else if (device instanceof TionBreezer) {
             return this.createBreezerAccessories(device);
+        } else if (device instanceof TionCO2Plus) {
+            return this.createCO2PlusAccessories(device);
         } else {
             throw new Error(`Unsupported device type ${device.constructor.name}`);
         }
@@ -129,7 +132,10 @@ export class AccessoriesFactory implements IAccessoriesFactory {
 
         ret.push(breezerAccessory);
 
-        const tempSensorAccessory: IHomebridgeAccessory = new Accessory(device.name, this.generateUuid(`${device.id}:outside_temperature`));
+        const tempSensorAccessory: IHomebridgeAccessory = new Accessory(
+            device.name,
+            this.generateUuid(`${device.id}:outside_temperature`)
+        );
         tempSensorAccessory.context = {
             id: device.id,
         };
@@ -142,12 +148,53 @@ export class AccessoriesFactory implements IAccessoriesFactory {
             .setCharacteristic(this.characteristicRegistry.FirmwareRevision, device.firmwareRevision)
             .setCharacteristic(this.characteristicRegistry.HardwareRevision, device.hardwareRevision);
 
-
-        tempSensorAccessory.addService(this.serviceRegistry.TemperatureSensor, 'Температура уличного воздуха')
+        tempSensorAccessory
+            .addService(this.serviceRegistry.TemperatureSensor, 'Температура уличного воздуха')
             .setCharacteristic(this.characteristicRegistry.StatusActive, 0)
             .setCharacteristic(this.characteristicRegistry.CurrentTemperature, 0);
 
         ret.push(tempSensorAccessory);
+
+        return ret;
+    }
+
+    private createCO2PlusAccessories(device: TionCO2Plus): IHomebridgeAccessory[] {
+        const ret: IHomebridgeAccessory[] = [];
+        const Accessory = this.accessoryClass;
+
+        const accessory: IHomebridgeAccessory = new Accessory(device.name, this.generateUuid(device.id));
+        accessory.context = {
+            id: device.id,
+        };
+
+        accessory.on('identify', (paired, callback) => {
+            this.log.info(`Identify ${device.id}`);
+
+            callback();
+        });
+
+        accessory
+            .getService(this.serviceRegistry.AccessoryInformation)
+            .setCharacteristic(this.characteristicRegistry.Manufacturer, 'Tion')
+            .setCharacteristic(this.characteristicRegistry.Model, device.modelName)
+            .setCharacteristic(this.characteristicRegistry.SerialNumber, device.mac)
+            .setCharacteristic(this.characteristicRegistry.FirmwareRevision, device.firmwareRevision)
+            .setCharacteristic(this.characteristicRegistry.HardwareRevision, device.hardwareRevision);
+
+        accessory
+            .addService(this.serviceRegistry.CarbonDioxideSensor, 'CO2')
+            .setCharacteristic(this.characteristicRegistry.CarbonDioxideDetected, 0)
+            .setCharacteristic(this.characteristicRegistry.CarbonDioxideLevel, 0);
+
+        accessory
+            .addService(this.serviceRegistry.TemperatureSensor, 'Температура')
+            .setCharacteristic(this.characteristicRegistry.CurrentTemperature, 0);
+
+        accessory
+            .addService(this.serviceRegistry.HumiditySensor, 'Влажность')
+            .setCharacteristic(this.characteristicRegistry.CurrentRelativeHumidity, 0);
+
+        ret.push(accessory);
 
         return ret;
     }
