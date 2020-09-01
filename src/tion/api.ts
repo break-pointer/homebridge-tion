@@ -51,7 +51,7 @@ export class TionApi implements ITionApi {
             });
             firstRequest = true;
         }
-        let stateResult;
+        let stateResult: ILocation[];
         try {
             stateResult = await this.stateRequest;
         } finally {
@@ -59,19 +59,21 @@ export class TionApi implements ITionApi {
                 this.stateRequest = undefined;
             }
         }
-        let ret: ILocation;
+        let ret: ILocation | null = null;
         if (this.config.homeName) {
-            const lower = this.config.homeName.toLowerCase();
-            const location = stateResult.find(loc => loc.name.toLowerCase() === lower);
+            const lower = this.config.homeName.toLowerCase().trim();
+            const location = stateResult.find(loc => loc.name.toLowerCase().trim() === lower);
             if (location) {
                 ret = location;
             } else {
                 this.log.warn(`Location ${this.config.homeName} not found, using first suitable`);
             }
         }
-        ret = stateResult.find(loc => loc.zones.length) || stateResult[0];
+        if (!ret) {
+            ret = stateResult.find(loc => loc.zones.length) || stateResult[0];
+        }
 
-        return ret;
+        return ret!;
     }
 
     public async execCommand(deviceId: string, payload: ICommand): Promise<ICommandResult> {
