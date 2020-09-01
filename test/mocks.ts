@@ -34,7 +34,7 @@ export class MockPlatformConfig implements ITionPlatformConfig {
     password: string;
 
     constructor() {
-        this.stationName = 'Home';
+        this.homeName = 'Home';
         this.userName = 'test';
         this.password = 'test';
         this.co2Threshold = 799;

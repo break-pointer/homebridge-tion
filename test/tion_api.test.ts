@@ -14,6 +14,8 @@ describe('Test Tion API', () => {
 
     test('It should login and recieve state', async () => {
         await expect(api.init()).resolves.toBeUndefined();
-        await expect(api.getSystemState()).resolves.toBeDefined();
+        const systemState = await api.getSystemState();
+        expect(systemState).toBeDefined();
+        expect(systemState.name).toEqual('Home')
     });
 });
