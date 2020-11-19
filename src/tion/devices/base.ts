@@ -87,11 +87,11 @@ export abstract class TionDeviceBase {
             const state = await this.api.getSystemState();
             if (this.parseState(state)) {
                 if (!this.isOnline) {
-                    this.accessories.forEach(a => a.reachable = false);
+                    this.accessories.forEach(a => (a.reachable = false));
                     this.log.error(`Device ${this.name} (${this.id}) not reachable`);
                     return callback('Not reachable');
                 }
-        
+
                 callback(null, getter());
             } else {
                 this.log.error(`Device ${this.name} (${this.id}) cannot parse state`);
@@ -106,10 +106,7 @@ export abstract class TionDeviceBase {
 
     protected rollbackCharacteristic(service: any, characteristic: any, value: string | number | boolean) {
         setTimeout(() => {
-            service.updateCharacteristic(
-                characteristic, 
-                value
-            );
+            service.updateCharacteristic(characteristic, value);
         }, 100);
     }
 }

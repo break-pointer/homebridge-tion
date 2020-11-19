@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import request from 'request-promise-native';
+import url from 'url';
+import fetch from 'node-fetch';
 
 import {ILog} from 'homebridge/framework';
 import {ITionPlatformConfig} from '../platform_config';
@@ -38,10 +39,23 @@ export interface ITionAuthStorage {
     load(): Promise<ITionAuthData>;
 }
 
+export class AuthError extends Error {
+    public statusCode: number;
+    constructor(message: string, statusCode: number) {
+        const trueProto = new.target.prototype;
+        super(message);
+        Object.setPrototypeOf(this, trueProto);
+
+        this.statusCode = statusCode;
+    }
+}
+
 export class TionAuthApi implements ITionAuthApi {
     private static oAuthUrl = 'https://api2.magicair.tion.ru/idsrv/oauth2/token';
     private static clientId = 'a750d720-e146-47b0-b414-35e3b1dd7862';
     private static clientSecret = 'DTT2jJnY3k2H2GyZ';
+    private static refreshClientId = '8b96527d-7632-4d56-bf75-3d1097e99d0e';
+    private static refreshClientSecret = 'qwerty';
 
     private log: ILog;
     private config: ITionPlatformConfig;
@@ -67,6 +81,7 @@ export class TionAuthApi implements ITionAuthApi {
     }
 
     public async authenticateUsingPassword(): Promise<string> {
+        this.log.debug('TionAuthApi - authenticating using password');
         await this._internalAuthenticate({
             grant_type: 'password',
             username: this.config.userName,
@@ -80,21 +95,32 @@ export class TionAuthApi implements ITionAuthApi {
     }
 
     public async authenticateUsingRefreshToken(): Promise<string> {
+        this.log.debug('TionAuthApi - authenticating using refresh token');
         await this._internalAuthenticate({
             grant_type: 'refresh_token',
             refresh_token: this.myAuthData.refresh_token,
             client_id: TionAuthApi.clientId,
             client_secret: TionAuthApi.clientSecret,
         });
+        await this.authStorage.save(this.myAuthData);
 
         return this.myAuthData.access_token;
     }
 
     private async _internalAuthenticate(params: ITionAuthPayload): Promise<void> {
         try {
-            this.myAuthData = await request.post(TionAuthApi.oAuthUrl, {form: params, json: true});
+            const authResult = await fetch(TionAuthApi.oAuthUrl, {
+                method: 'POST',
+                body: new url.URLSearchParams(params as any),
+            });
+
+            if (authResult.ok) {
+                this.myAuthData = await authResult.json();
+            } else {
+                throw new AuthError(authResult.statusText, authResult.status);
+            }
         } catch (err) {
-            this.log.error('TionAuthApi._internalAuthenticate: ', err.message || err.statusCode);
+            this.log.error('TionAuthApi._internalAuthenticate: ', err.message);
             throw err;
         }
     }

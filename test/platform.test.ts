@@ -6,7 +6,7 @@ import { TionPlatform } from '../src/platform';
 
 import {MockLog, MockTionAuthStorage, MockPlatformConfig, MockHomebridge, MockHomebridgeApi} from './mocks';
 
-jest.mock('request-promise-native');
+jest.mock('node-fetch');
 
 function setup(): [MockHomebridgeApi, TionPlatform] {
     const homebridge = new MockHomebridge();

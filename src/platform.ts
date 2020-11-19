@@ -43,7 +43,7 @@ export class TionPlatform {
         if (!this.hbAccessories.find(a => a.UUID === accessory.UUID)) {
             this.hbAccessories.push(accessory);
         }
-    }
+    };
 
     private init = async () => {
         this.log.debug('Initializing');
@@ -58,19 +58,19 @@ export class TionPlatform {
             this.log.error('Initialization error');
             this.log.error(err);
         }
-    }
+    };
 
     private shutdown = async () => {
         this.log.debug('Shutting down');
         clearInterval(this.pollInterval);
-    }
+    };
 
     private poll = async () => {
         const location = await this.tionApi.getSystemState();
         this.tionDevices = this.tionDevicesFactory.createDevices(this.tionDevices, location);
         this.mergeAccessories();
         this.updateState(location);
-    }
+    };
 
     private mergeAccessories(): void {
         this.log.debug(`Merging ${this.tionDevices.length} devices and ${this.hbAccessories.length} accessories`);

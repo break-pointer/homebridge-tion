@@ -11,3 +11,4 @@ tsconfig.json
 tslint.json
 *.tgz
 deploy
+.prettierrc

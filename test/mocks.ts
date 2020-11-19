@@ -1,27 +1,27 @@
-import { ITionAuthStorage, ITionAuthData } from "../src/tion/auth";
-import { ITionPlatformConfig } from "../src/platform_config";
-import { IHomebridge, HomebridgePlatform, IHomebridgeApi } from "../src/homebridge/framework";
-import { EventEmitter } from "events";
-
+import {EventEmitter} from 'events';
 import {createHash} from 'crypto';
 
+import {ITionAuthStorage, ITionAuthData} from '../src/tion/auth';
+import {ITionPlatformConfig} from '../src/platform_config';
+import {IHomebridge, HomebridgePlatform, IHomebridgeApi} from '../src/homebridge/framework';
+
 export const MockLog = (...args) => console.log(...args);
-MockLog.debug  = MockLog;
+MockLog.debug = MockLog;
 MockLog.info = MockLog;
 MockLog.warn = MockLog;
 MockLog.error = MockLog;
 MockLog.log = MockLog;
 
 export class MockTionAuthStorage implements ITionAuthStorage {
-    private auth = require('../__mocks__/data/auth.json');
+    private auth: ITionAuthData;
 
     public save = jest.fn(async (authData: ITionAuthData) => {
         this.auth = authData;
-    })
-     
+    });
+
     public load = jest.fn(async () => {
         return this.auth;
-    })
+    });
 }
 
 export class MockPlatformConfig implements ITionPlatformConfig {
@@ -45,9 +45,9 @@ export class MockPlatformConfig implements ITionPlatformConfig {
 export class MockPlatformAccessory {
     private services: MockServiceBase[];
 
-    constructor () {
+    constructor() {
         this.services = [];
-        this.services.push(new AccessoryInformation(""));
+        this.services.push(new AccessoryInformation(''));
     }
 
     addService(service: typeof MockServiceBase, name: string): MockServiceBase {
@@ -64,7 +64,7 @@ export class MockPlatformAccessory {
         return ret;
     }
 
-    on = jest.fn((event: string, callback: () => {}) => {})
+    on = jest.fn((event: string, callback: () => {}) => {});
 }
 
 class MockServiceBase {
@@ -79,15 +79,15 @@ class MockServiceBase {
     }
 
     addCharacteristic(characteristic: typeof MockCharacteristicBase): MockServiceBase {
-         this.characteristics.push(new characteristic(""));
-          return this;
+        this.characteristics.push(new characteristic(''));
+        return this;
     }
 
     getCharacteristic(characteristic: typeof MockCharacteristicBase): MockCharacteristicBase {
         let ret = this.characteristics.find(ch => ch instanceof characteristic);
         if (!ret) {
             try {
-                ret = new characteristic("");
+                ret = new characteristic('');
                 this.characteristics.push(ret);
             } catch (err) {
                 console.log(characteristic);
@@ -114,26 +114,19 @@ class MockServiceBase {
     }
 }
 
-class AccessoryInformation extends MockServiceBase {
-}
+class AccessoryInformation extends MockServiceBase {}
 
-class CarbonDioxideSensor extends MockServiceBase {
-}
+class CarbonDioxideSensor extends MockServiceBase {}
 
-class TemperatureSensor extends MockServiceBase {
-}
+class TemperatureSensor extends MockServiceBase {}
 
-class HumiditySensor extends MockServiceBase {
-}
+class HumiditySensor extends MockServiceBase {}
 
-class AirPurifier extends MockServiceBase {
-}
+class AirPurifier extends MockServiceBase {}
 
-class FilterMaintenance extends MockServiceBase {
-}
+class FilterMaintenance extends MockServiceBase {}
 
-class HeaterCooler extends MockServiceBase {
-}
+class HeaterCooler extends MockServiceBase {}
 
 class MockCharacteristicBase {
     value: string | number;
@@ -145,7 +138,7 @@ class MockCharacteristicBase {
         this.events = {};
         this.props = {};
     }
- 
+
     on(direction: 'get' | 'set', fn: any) {
         this.events[direction] = fn;
         return this;
@@ -161,65 +154,46 @@ class MockCharacteristicBase {
     }
 }
 
-class Manufacturer extends MockCharacteristicBase {
-}
+class Manufacturer extends MockCharacteristicBase {}
 
-class Model extends MockCharacteristicBase {
-}
+class Model extends MockCharacteristicBase {}
 
-class SerialNumber extends MockCharacteristicBase {
-}
+class SerialNumber extends MockCharacteristicBase {}
 
-class FirmwareRevision extends MockCharacteristicBase {
-}
+class FirmwareRevision extends MockCharacteristicBase {}
 
-class HardwareRevision extends MockCharacteristicBase {
-}
+class HardwareRevision extends MockCharacteristicBase {}
 
-class CarbonDioxideLevel extends MockCharacteristicBase {
-}
+class CarbonDioxideLevel extends MockCharacteristicBase {}
 
-class CarbonDioxideDetected extends MockCharacteristicBase {
-}
+class CarbonDioxideDetected extends MockCharacteristicBase {}
 
-class CurrentTemperature extends MockCharacteristicBase {
-}
+class CurrentTemperature extends MockCharacteristicBase {}
 
-class CurrentRelativeHumidity extends MockCharacteristicBase {
-}
+class CurrentRelativeHumidity extends MockCharacteristicBase {}
 
-class Active extends MockCharacteristicBase {
-}
+class Active extends MockCharacteristicBase {}
 
-class StatusActive extends MockCharacteristicBase {
-}
+class StatusActive extends MockCharacteristicBase {}
 
-class CurrentAirPurifierState extends MockCharacteristicBase {
-}
+class CurrentAirPurifierState extends MockCharacteristicBase {}
 
-class TargetAirPurifierState extends MockCharacteristicBase {
-}
+class TargetAirPurifierState extends MockCharacteristicBase {}
 
-class RotationSpeed extends MockCharacteristicBase {
-}
+class RotationSpeed extends MockCharacteristicBase {}
 
-class FilterChangeIndication extends MockCharacteristicBase {
-}
+class FilterChangeIndication extends MockCharacteristicBase {}
 
-class FilterLifeLevel extends MockCharacteristicBase {
-}
+class FilterLifeLevel extends MockCharacteristicBase {}
 
-class CurrentHeaterCoolerState extends MockCharacteristicBase {
-}
+class CurrentHeaterCoolerState extends MockCharacteristicBase {}
 
-class TargetHeaterCoolerState extends MockCharacteristicBase {
-}
+class TargetHeaterCoolerState extends MockCharacteristicBase {}
 
-class HeatingThresholdTemperature extends MockCharacteristicBase {
-}
+class HeatingThresholdTemperature extends MockCharacteristicBase {}
 
-export class MockHomebridge implements IHomebridge{
-    public hap = { 
+export class MockHomebridge implements IHomebridge {
+    public hap = {
         Service: {
             AccessoryInformation,
             CarbonDioxideSensor,
@@ -227,8 +201,8 @@ export class MockHomebridge implements IHomebridge{
             HumiditySensor,
             AirPurifier,
             FilterMaintenance,
-            HeaterCooler
-       }, 
+            HeaterCooler,
+        },
         Characteristic: {
             Manufacturer,
             Model,
@@ -248,25 +222,29 @@ export class MockHomebridge implements IHomebridge{
             FilterLifeLevel,
             CurrentHeaterCoolerState,
             TargetHeaterCoolerState,
-            HeatingThresholdTemperature
+            HeatingThresholdTemperature,
         },
-        uuid: {generate: (x: string) => createHash('md5').update(x).digest("hex")},
+        uuid: {
+            generate: (x: string) =>
+                createHash('md5')
+                    .update(x)
+                    .digest('hex'),
+        },
     };
     public user = {};
 
     public platformAccessory = MockPlatformAccessory;
 
-    public registerPlatform = jest.fn((identifier: string, name: string, platform: typeof HomebridgePlatform, dynamic: boolean) => {
-    });
+    public registerPlatform = jest.fn(
+        (identifier: string, name: string, platform: typeof HomebridgePlatform, dynamic: boolean) => {}
+    );
 }
 
 export class MockHomebridgeApi implements IHomebridgeApi {
     private eventEmitter = new EventEmitter();
 
-    public registerPlatformAccessories = jest.fn((identifier: string, name: string, accessories: any[]) => {
-    })
-    public unregisterPlatformAccessories = jest.fn((identifier: string, name: string, accessories: any[]) => {
-    })
+    public registerPlatformAccessories = jest.fn((identifier: string, name: string, accessories: any[]) => {});
+    public unregisterPlatformAccessories = jest.fn((identifier: string, name: string, accessories: any[]) => {});
 
     public on(eventName: string, callback: () => void) {
         this.eventEmitter.on(eventName, callback);

@@ -43,12 +43,12 @@ export class TionBreezer extends TionDeviceBase {
         this.targetTemperature = 22;
         this.currentTemperature = 22;
         this.outsideTemperature = 22;
-        
+
         this.filterChangeIndication = false;
         this.filterLifeLevel = 1;
-        
+
         this.airIntake = 0;
-        
+
         this.maxSpeed = device.max_speed || 0;
         this.maxTargetTemperature = device.t_max || 0;
         this.firstParse = true;
@@ -171,11 +171,7 @@ export class TionBreezer extends TionDeviceBase {
                             return callback('Not reachable');
                         }
                         if (!this.isOn) {
-                            this.rollbackCharacteristic(
-                                heater, 
-                                this.characteristicRegistry.Active,
-                                0
-                            );
+                            this.rollbackCharacteristic(heater, this.characteristicRegistry.Active, 0);
                             return callback();
                         }
                         value = Boolean(value);
@@ -260,7 +256,7 @@ export class TionBreezer extends TionDeviceBase {
         if (outsideTemperature) {
             outsideTemperature
                 .getCharacteristic(this.characteristicRegistry.StatusActive)
-                .on('get', callback => this.getState(callback, () => this.isOn ? 1 : 0));
+                .on('get', callback => this.getState(callback, () => (this.isOn ? 1 : 0)));
 
             outsideTemperature
                 .getCharacteristic(this.characteristicRegistry.CurrentTemperature)
@@ -317,10 +313,7 @@ export class TionBreezer extends TionDeviceBase {
             const outsideTemperature = accessory.getService(this.serviceRegistry.TemperatureSensor);
             if (outsideTemperature) {
                 outsideTemperature[action](this.characteristicRegistry.StatusActive, this.isOn ? 1 : 0);
-                outsideTemperature[action](
-                    this.characteristicRegistry.CurrentTemperature, 
-                    this.outsideTemperature
-                );
+                outsideTemperature[action](this.characteristicRegistry.CurrentTemperature, this.outsideTemperature);
             }
         });
     }
@@ -343,7 +336,7 @@ export class TionBreezer extends TionDeviceBase {
             this.currentTemperature = device.data.t_out || 0;
         }
 
-        if (this.isOn && this.firstParse) {
+        if (this.isOn && !this.firstParse) {
             this.outsideTemperature = device.data.t_in || 0;
         }
 

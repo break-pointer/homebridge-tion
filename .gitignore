@@ -1,8 +1,7 @@
 .vscode
 .idea
 dist
-test/data
-__mocks__/data
+test/data/*
 
 # Logs
 logs

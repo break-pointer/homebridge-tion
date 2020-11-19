@@ -3,13 +3,29 @@
   "version": "1.0.13",
   "description": "Homebridge plugin to control Tion breezers",
   "main": "./dist/index.js",
+  "config": {
+    "ghooks": {
+      "pre-commit": "npm run type-check && npm run lint && npm run test"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "prettier --write --config ./.prettierrc",
+      "tslint --fix --project ./tsconfig.json"
+    ],
+    "src/**/*.{css,scss}": [
+      "prettier --write --config ./.prettierrc"
+    ]
+  },
   "scripts": {
-    "prettier": "prettier --write \"./src/**\"",
     "dev": "tsc -w",
     "type-check": "tsc --skipLibCheck",
-    "lint": "tslint './src/**/*.{ts,tsx}'",
+    "lint": "tslint 'src/**/*.ts' --project ./tsconfig.json",
+    "prettier": "prettier --write --config ./.prettierrc src/**/*.ts",
     "test": "jest",
-    "build": "ttsc"
+    "build": "ttsc",
+    "preversion": "npm run type-check && npm run lint && npm run test",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
@@ -38,33 +54,19 @@
     "node": ">=8.10.0",
     "homebridge": ">=0.4.45"
   },
-  "prettier": {
-    "filepath": "./src/*",
-    "printWidth": 120,
-    "singleQuote": true,
-    "trailingComma": "es5",
-    "semi": true,
-    "tabWidth": 4,
-    "bracketSpacing": false
-  },
   "jest": {
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
     "testEnvironment": "node"
   },
-  "config": {
-    "ghooks": {
-      "pre-commit": "npm run type-check && npm run lint && npm run test"
-    }
-  },
   "devDependencies": {
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.4",
-    "@types/request": "^2.48.3",
-    "@types/request-promise-native": "^1.0.17",
+    "@types/node-fetch": "^2.5.7",
     "ghooks": "^2.0.4",
     "jest": "^24.9.0",
+    "lint-staged": "^10.5.1",
     "prettier": "^1.18.2",
     "ts-jest": "^24.0.2",
     "ts-node": "^8.4.1",
@@ -76,7 +78,6 @@
     "typescript": "^3.6.2"
   },
   "dependencies": {
-    "request": "^2.88.0",
-    "request-promise-native": "^1.0.7"
+    "node-fetch": "^2.6.1"
   }
 }

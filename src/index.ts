@@ -53,7 +53,7 @@ class TionPlatformWrapper extends HomebridgePlatform {
 
     public configureAccessory = (accessory: IHomebridgeAccessory) => {
         return this.instance && this.instance.loadCachedAccessory(accessory);
-    }
+    };
 }
 
 export default (homebridge: IHomebridge): void => {

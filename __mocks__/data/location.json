@@ -1,0 +1,442 @@
+[
+    {
+        "guid": "27bcdb8d-9af5-419e-b044-f979a92c5850",
+        "name": "House",
+        "comment": null,
+        "timezone": 18000,
+        "type": "unknown",
+        "access_level": "owner",
+        "repository": "production",
+        "mac": "00:00:00:00:00:00",
+        "connection": {
+            "state": "noConnection",
+            "is_online": false,
+            "last_seen_iso": "0001-01-01T00:00:00.0000000",
+            "last_seen": 0,
+            "last_packet_time_iso": "0001-01-01T00:00:00.0000000",
+            "last_packet_time": 0,
+            "data_state": "noData",
+            "last_seen_delta": 1569745527
+        },
+        "update": {
+            "state": "unknown",
+            "device_type": "unknown",
+            "mac": 0,
+            "mac_human": "00:00:00:00:00:00",
+            "progress": 0
+        },
+        "unique_key": "a177f547-f10d-4250-8e94-f58b6d34dabd",
+        "replace_in_progress": false,
+        "struct_received": false,
+        "order": 0,
+        "zones": [
+            {
+                "guid": "d9f88238-e25a-453a-9069-bc51abe44410",
+                "name": "",
+                "type": "unkown",
+                "color": "",
+                "is_virtual": true,
+                "mode": {
+                    "current": "off",
+                    "auto_set": {
+                        "co2": 0,
+                        "temperature": 0,
+                        "humidity": 0,
+                        "noise": 0,
+                        "pm25": 0,
+                        "pm10": 0
+                    }
+                },
+                "schedule": {
+                    "is_schedule_sync": true,
+                    "is_active": false,
+                    "is_mode_sync": false,
+                    "current_preset": {},
+                    "next_preset_starts_at": 0,
+                    "next_starts_iso": "1970-01-01T00:00:00.0000000Z"
+                },
+                "sensors_average": [
+                    {
+                        "data_type": "co2th",
+                        "have_sensors": [],
+                        "data": {
+                            "co2": "NaN",
+                            "temperature": "NaN",
+                            "humidity": "NaN",
+                            "pm25": "NaN",
+                            "pm10": "NaN",
+                            "radon": 0,
+                            "measurement_time_iso": "2019-09-29T08:25:25.0000000",
+                            "measurement_time": 1569745525
+                        }
+                    }
+                ],
+                "hw_id": 0,
+                "devices": [],
+                "order": 1,
+                "creation_time_iso": "2019-08-29T08:06:23.0577927Z",
+                "creation_time": 1567065983,
+                "update_time_iso": "2019-08-29T08:06:23.0577927Z",
+                "update_time": 1567065983
+            }
+        ],
+        "creation_time_iso": "2019-09-11T07:08:37.8893743Z",
+        "creation_time": 1568185717,
+        "update_time_iso": "2019-09-11T07:08:37.8893743Z",
+        "update_time": 1568185717
+    },
+    {
+        "guid": "6df744d7-93f9-4c8c-b2eb-0187bb520eab",
+        "name": "Home",
+        "comment": null,
+        "timezone": 18000,
+        "type": "unknown",
+        "access_level": "owner",
+        "repository": "production",
+        "mac": "53:4D:76:31:39:50",
+        "connection": {
+            "state": "connected",
+            "is_online": true,
+            "last_seen_iso": "2019-09-29T08:25:19.3732791Z",
+            "last_seen": 1569745519,
+            "last_packet_time_iso": "2019-09-29T08:25:19.3732791Z",
+            "last_packet_time": 1569745519,
+            "data_state": "valid",
+            "last_seen_delta": 0
+        },
+        "update": {
+            "state": "no",
+            "device_type": "unknown",
+            "mac": 0,
+            "mac_human": "00:00:00:00:00:00",
+            "progress": 0
+        },
+        "unique_key": "3cbd4c4b-0408-4b37-9985-139fa849ea1d",
+        "replace_in_progress": false,
+        "struct_received": true,
+        "order": 0,
+        "zones": [
+            {
+                "guid": "d9f88238-e25a-453a-9069-bc51abe44410",
+                "name": "",
+                "type": "unkown",
+                "color": "",
+                "is_virtual": true,
+                "mode": {
+                    "current": "off",
+                    "auto_set": {
+                        "co2": 0,
+                        "temperature": 0,
+                        "humidity": 0,
+                        "noise": 0,
+                        "pm25": 0,
+                        "pm10": 0
+                    }
+                },
+                "schedule": {
+                    "is_schedule_sync": true,
+                    "is_active": false,
+                    "is_mode_sync": false,
+                    "current_preset": {},
+                    "next_preset_starts_at": 0,
+                    "next_starts_iso": "1970-01-01T00:00:00.0000000Z"
+                },
+                "sensors_average": [
+                    {
+                        "data_type": "co2th",
+                        "have_sensors": [],
+                        "data": {
+                            "co2": "NaN",
+                            "temperature": "NaN",
+                            "humidity": "NaN",
+                            "pm25": "NaN",
+                            "pm10": "NaN",
+                            "radon": 0,
+                            "measurement_time_iso": "2019-09-29T08:25:25.0000000",
+                            "measurement_time": 1569745525
+                        }
+                    }
+                ],
+                "hw_id": 0,
+                "devices": [],
+                "order": 1,
+                "creation_time_iso": "2019-08-29T08:06:23.0577927Z",
+                "creation_time": 1567065983,
+                "update_time_iso": "2019-08-29T08:06:23.0577927Z",
+                "update_time": 1567065983
+            },
+            {
+                "guid": "3291ce4a-4c35-4894-8f9a-6223f6d8741f",
+                "name": "Bedroom",
+                "type": "unkown",
+                "color": "00ccff",
+                "is_virtual": false,
+                "mode": {
+                    "current": "manual",
+                    "auto_set": {
+                        "co2": 800,
+                        "temperature": 0,
+                        "humidity": 0,
+                        "noise": 0,
+                        "pm25": 0,
+                        "pm10": 0
+                    }
+                },
+                "schedule": {
+                    "is_schedule_sync": true,
+                    "is_active": false,
+                    "is_mode_sync": false,
+                    "current_preset": {},
+                    "next_preset_starts_at": 0,
+                    "next_starts_iso": "1970-01-01T00:00:00.0000000Z"
+                },
+                "sensors_average": [
+                    {
+                        "data_type": "co2th",
+                        "have_sensors": ["temperature", "humidity", "co2"],
+                        "data": {
+                            "co2": 775,
+                            "temperature": 22.57,
+                            "humidity": 34.27,
+                            "pm25": "NaN",
+                            "pm10": "NaN",
+                            "radon": 0,
+                            "measurement_time_iso": "2019-09-29T08:25:25.0000000",
+                            "measurement_time": 1569745525
+                        }
+                    }
+                ],
+                "hw_id": 718041192,
+                "devices": [
+                    {
+                        "guid": "908d521f-4fc5-4715-b25e-62226c1e5755",
+                        "name": "MagicAir",
+                        "type": "co2mb",
+                        "subtype_d": 32769,
+                        "control_type": "self",
+                        "mac": "53:4D:76:31:39:50",
+                        "mac_long": 88206573194579,
+                        "is_online": true,
+                        "last_seen_delta": 0,
+                        "zone_hwid": 718041192,
+                        "serial_number": "",
+                        "order": 0,
+                        "data": {
+                            "status": "application",
+                            "wi-fi": 120,
+                            "pairing": {
+                                "stage": "off",
+                                "time_left": 0,
+                                "pairing_result": false,
+                                "mac": "00:00:00:00:00:00",
+                                "device_type": "unknown",
+                                "subtype": "0000",
+                                "subtype_d": 0
+                            },
+                            "co2": 775,
+                            "temperature": 22.57,
+                            "humidity": 34.27,
+                            "pm25": "NaN",
+                            "pm10": "NaN",
+                            "signal_level": 0,
+                            "backlight": 0,
+                            "reliability_code": "0x00000007",
+                            "last_seen_iso": "2019-09-29T08:25:25.0000000",
+                            "last_seen": 1569745525,
+                            "measurement_time_iso": "2019-09-29T08:25:25.0000000",
+                            "measurement_time": 1569745525
+                        },
+                        "firmware": "03F5",
+                        "hardware": "0001",
+                        "creation_time": 1567065983,
+                        "update_time": 1568875826
+                    },
+                    {
+                        "guid": "a6e6406f-06b3-45b7-85de-3884835eacf4",
+                        "name": "Вентилятор",
+                        "type": "breezer3",
+                        "subtype_d": 0,
+                        "control_type": "rf",
+                        "mac": "4B:24:7F:DB:1A:2F",
+                        "mac_long": 51792398197835,
+                        "temperature_control": "absolute",
+                        "is_online": true,
+                        "last_seen_delta": 0,
+                        "zone_hwid": 718041192,
+                        "max_speed": 6,
+                        "serial_number": "",
+                        "order": 1,
+                        "data": {
+                            "status": "application",
+                            "is_on": true,
+                            "data_valid": true,
+                            "heater_installed": true,
+                            "heater_enabled": true,
+                            "speed": 1,
+                            "speed_m3h": 30,
+                            "speed_max_set": 6,
+                            "speed_min_set": 0,
+                            "speed_limit": 6,
+                            "t_in": 6,
+                            "t_set": 22,
+                            "t_out": 22,
+                            "gate": 2,
+                            "run_seconds": 16358619,
+                            "filter_time_seconds": 19050215,
+                            "rc_controlled": false,
+                            "filter_need_replace": false,
+                            "signal_level": 154,
+                            "measurement_time_iso": "2019-09-29T08:25:25.0000000",
+                            "measurement_time": 1569745525,
+                            "errors": {
+                                "code": "0x00000000",
+                                "list": []
+                            }
+                        },
+                        "firmware": "003B",
+                        "hardware": "0001",
+                        "t_max": 30,
+                        "t_min": 0,
+                        "creation_time": 1567999850,
+                        "update_time": 1569382596
+                    }
+                ],
+                "order": 2,
+                "creation_time_iso": "2019-08-29T08:10:28.2951497Z",
+                "creation_time": 1567066228,
+                "update_time_iso": "2019-08-29T08:10:28.2951497Z",
+                "update_time": 1567066228
+            },
+            {
+                "guid": "98e2c839-781c-4a45-9ba2-92ce6ce2d181",
+                "name": "Kitchen",
+                "type": "unkown",
+                "color": "33cc99",
+                "is_virtual": false,
+                "mode": {
+                    "current": "manual",
+                    "auto_set": {
+                        "co2": 800,
+                        "temperature": 0,
+                        "humidity": 0,
+                        "noise": 0,
+                        "pm25": 0,
+                        "pm10": 0
+                    }
+                },
+                "schedule": {
+                    "is_schedule_sync": true,
+                    "is_active": false,
+                    "is_mode_sync": false,
+                    "current_preset": {},
+                    "next_preset_starts_at": 0,
+                    "next_starts_iso": "1970-01-01T00:00:00.0000000Z"
+                },
+                "sensors_average": [
+                    {
+                        "data_type": "co2th",
+                        "have_sensors": [],
+                        "data": {
+                            "co2": "NaN",
+                            "temperature": "NaN",
+                            "humidity": "NaN",
+                            "pm25": "NaN",
+                            "pm10": "NaN",
+                            "radon": 0,
+                            "measurement_time_iso": "2019-09-29T08:25:25.0000000",
+                            "measurement_time": 1569745525
+                        }
+                    }
+                ],
+                "hw_id": 718041193,
+                "devices": [
+                    {
+                        "guid": "46a67439-a705-4c1e-8114-81062ddf4c54",
+                        "name": "Вентилятор",
+                        "type": "tionO2Rf",
+                        "subtype_d": 0,
+                        "control_type": "rf",
+                        "mac": "48:18:1B:0A:9C:F7",
+                        "mac_long": 272249556506696,
+                        "temperature_control": "absolute",
+                        "is_online": true,
+                        "last_seen_delta": 0,
+                        "zone_hwid": 718041193,
+                        "max_speed": 4,
+                        "serial_number": "",
+                        "order": 0,
+                        "data": {
+                            "status": "application",
+                            "is_on": false,
+                            "data_valid": true,
+                            "heater_installed": true,
+                            "heater_enabled": true,
+                            "speed": 1,
+                            "speed_m3h": 0,
+                            "speed_max_set": 4,
+                            "speed_min_set": 0,
+                            "speed_limit": 4,
+                            "t_in": 23,
+                            "t_set": 25,
+                            "t_out": 23,
+                            "run_seconds": 1410660,
+                            "filter_time_seconds": 30212900,
+                            "rc_controlled": false,
+                            "filter_need_replace": false,
+                            "signal_level": 136,
+                            "measurement_time_iso": "2019-09-29T08:25:25.0000000",
+                            "measurement_time": 1569745525,
+                            "errors": {
+                                "code": "0x00000000",
+                                "list": []
+                            }
+                        },
+                        "firmware": "018F:130C",
+                        "hardware": "0001:6108",
+                        "t_max": 25,
+                        "t_min": -20,
+                        "creation_time": 1567999903,
+                        "update_time": 1569382615
+                    },
+                    {
+                        "guid": "3b71bbe5-12c7-40b8-b220-9811e92e1f6b",
+                        "name": "Датчики",
+                        "type": "co2Plus",
+                        "subtype_d": 0,
+                        "control_type": "rf",
+                        "mac": "68:41:2B:36:24:55",
+                        "mac_long": 85804432531811,
+                        "is_online": true,
+                        "last_seen_delta": 0,
+                        "zone_hwid": 718041193,
+                        "serial_number": "CO2 DefaultSN",
+                        "order": 0,
+                        "data": {
+                            "status": "application",
+                            "co2": 760.0,
+                            "temperature": 26.4,
+                            "humidity": 29.8,
+                            "signal_level": 114,
+                            "backlight": 1,
+                            "measurement_time_iso": "2020-04-04T11:14:45.0000000",
+                            "measurement_time": 1585998885
+                        },
+                        "firmware": "0105",
+                        "hardware": "0001",
+                        "creation_time": 1560682543,
+                        "update_time": 1581488034
+                    }
+                ],
+                "order": 3,
+                "creation_time_iso": "2019-08-29T08:16:17.7658686Z",
+                "creation_time": 1567066577,
+                "update_time_iso": "2019-08-29T08:16:17.7658686Z",
+                "update_time": 1567066577
+            }
+        ],
+        "creation_time_iso": "2019-08-29T07:58:03.5258853Z",
+        "creation_time": 1567065483,
+        "update_time_iso": "2019-08-29T07:58:03.5258853Z",
+        "update_time": 1567065483
+    }
+]

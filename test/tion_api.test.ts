@@ -1,14 +1,16 @@
-import { TionAuthApi } from '../src/tion/auth';
-import { TionApi } from '../src/tion/api';
+import path from 'path';
 
-import {MockLog, MockTionAuthStorage, MockPlatformConfig} from './mocks';
+import {TionAuthApi, TionFilesystemAuthStorage} from '../src/tion/auth';
+import {TionApi} from '../src/tion/api';
 
-jest.mock('request-promise-native');
+import {MockLog, MockPlatformConfig} from './mocks';
+
+jest.mock('node-fetch');
 
 describe('Test Tion API', () => {
     const config = new MockPlatformConfig();
 
-    const authStorage = new MockTionAuthStorage();
+    const authStorage = new TionFilesystemAuthStorage(MockLog, path.join(__dirname, 'data'));
     const authApi = new TionAuthApi(MockLog, config, authStorage);
     const api = new TionApi(MockLog, config, authApi);
 
@@ -16,6 +18,6 @@ describe('Test Tion API', () => {
         await expect(api.init()).resolves.toBeUndefined();
         const systemState = await api.getSystemState();
         expect(systemState).toBeDefined();
-        expect(systemState.name).toEqual('Home')
+        expect(systemState.name).toEqual('Home');
     });
 });
