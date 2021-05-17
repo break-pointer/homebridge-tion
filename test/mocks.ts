@@ -32,6 +32,7 @@ export class MockPlatformConfig implements ITionPlatformConfig {
     apiRequestTimeout: number;
     userName: string;
     password: string;
+    percentSpeed: boolean;
 
     constructor() {
         this.homeName = 'Home';
@@ -39,6 +40,7 @@ export class MockPlatformConfig implements ITionPlatformConfig {
         this.password = 'test';
         this.co2Threshold = 799;
         this.apiRequestTimeout = 1001;
+        this.percentSpeed = true;
     }
 }
 

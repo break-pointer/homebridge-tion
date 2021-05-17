@@ -77,9 +77,9 @@ export class TionCO2Plus extends TionDeviceBase {
         }
 
         this.isOnline = device.is_online;
-        this.co2Level = device.data.co2 || 0;
-        this.temperature = device.data.temperature || 0;
-        this.humidity = device.data.humidity || 0;
+        this.co2Level = device.data?.co2 || 0;
+        this.temperature = device.data?.temperature || 0;
+        this.humidity = device.data?.humidity || 0;
 
         return true;
     }

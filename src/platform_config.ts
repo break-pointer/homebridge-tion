@@ -11,6 +11,7 @@ export interface ITionPlatformConfig extends IHomebridgePlatformConfig {
     password: string;
     co2Threshold: number;
     apiRequestTimeout: number;
+    percentSpeed: boolean;
 }
 
 export function validate(log: ILog, config: ITionPlatformConfig): boolean {
@@ -36,14 +37,17 @@ export function sanitize(log: ILog, config: ITionPlatformConfig): ITionPlatformC
     }
     if ('homeName' in config && typeof config.homeName !== 'string') {
         log.warn(`config.homeName has incompatible value, removing`);
+        // @ts-expect-error The operand of a 'delete' operator must be optional.
         delete config.homeName;
     }
     if ('userName' in config && typeof config.userName !== 'string') {
         log.warn(`config.userName has incompatible value, removing`);
+        // @ts-expect-error The operand of a 'delete' operator must be optional.
         delete config.userName;
     }
     if ('password' in config && typeof config.password !== 'string') {
         log.warn(`config.password has incompatible value, removing`);
+        // @ts-expect-error The operand of a 'delete' operator must be optional.
         delete config.password;
     }
     if ('co2Threshold' in config) {
@@ -65,6 +69,17 @@ export function sanitize(log: ILog, config: ITionPlatformConfig): ITionPlatformC
         }
     } else {
         Object.assign(config, {apiRequestTimeout: 1500});
+    }
+    if ('percentSpeed' in config) {
+        if (
+            config.percentSpeed !== false &&
+            config.percentSpeed !== true
+        ) {
+            log.warn(`config.percentSpeed has incompatible value, setting false`);
+            Object.assign(config, {percentSpeed: false});
+        }
+    } else {
+        Object.assign(config, {percentSpeed: false});
     }
     return config;
 }

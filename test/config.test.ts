@@ -13,12 +13,14 @@ describe('Test Platform Config', () => {
             userName: 'test',
             password: 'test',
             co2Threshold: 799,
-            apiRequestTimeout: 1001
-,         });
+            apiRequestTimeout: 1001,
+            percentSpeed: true,
+        });
     });
 
     test('Invalid config should not pass validation', () => {
         const config = new MockPlatformConfig();
+        // @ts-expect-error The operand of a 'delete' operator must be optional.
         delete config.password;
 
         expect(validate(MockLog, config)).toBeFalsy();
@@ -32,13 +34,15 @@ describe('Test Platform Config', () => {
             userName: 123,
             password: 123,
             co2Threshold: -100,
-            apiRequestTimeout: 0
+            apiRequestTimeout: 0,
+            percentSpeed: -1
         });
 
         expect(sanitize(MockLog, config)).toEqual({
             name: 'Tion',
             co2Threshold: 800,
-            apiRequestTimeout: 1500
+            apiRequestTimeout: 1500,
+            percentSpeed: false
         });
     });
 });

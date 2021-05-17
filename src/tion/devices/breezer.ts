@@ -7,6 +7,7 @@ import {ITionApi} from 'tion/api';
 export class TionBreezer extends TionDeviceBase {
     public isOn: boolean;
     public currentSpeed: number;
+    public currentSpeedHomekit: number;
     public speedLimit: number;
 
     public readonly isHeaterInstalled: boolean;
@@ -24,6 +25,8 @@ export class TionBreezer extends TionDeviceBase {
     private readonly maxTargetTemperature: number;
     private firstParse: boolean;
 
+    private readonly speedTick: number;
+
     constructor(
         device: IDevice,
         log: ILog,
@@ -36,6 +39,7 @@ export class TionBreezer extends TionDeviceBase {
 
         this.isOn = false;
         this.currentSpeed = 0;
+        this.currentSpeedHomekit = 0;
         this.speedLimit = device.max_speed || 0;
 
         this.isHeaterInstalled = device.data.heater_installed || false;
@@ -52,6 +56,8 @@ export class TionBreezer extends TionDeviceBase {
         this.maxSpeed = device.max_speed || 0;
         this.maxTargetTemperature = device.t_max || 0;
         this.firstParse = true;
+
+        this.speedTick = this.maxSpeed ? 1 / this.maxSpeed : 1;
     }
 
     public addEventHandlers(accessory: IHomebridgeAccessory): void {
@@ -98,6 +104,15 @@ export class TionBreezer extends TionDeviceBase {
                             this.characteristicRegistry.Active,
                             value ? this.isHeaterOn : false
                         );
+                        if (this.config.percentSpeed) {
+                            if (value) {
+                                this.currentSpeedHomekit = this.getHomekitSpeed(this.currentSpeed);
+                                airPurifier.updateCharacteristic(
+                                    this.characteristicRegistry.RotationSpeed,
+                                    this.currentSpeedHomekit
+                                );
+                            }
+                        }
                         callback();
                     } catch (err) {
                         this.log.error(err.message || err);
@@ -118,30 +133,40 @@ export class TionBreezer extends TionDeviceBase {
                 })
                 .on('get', callback => this.getState(callback, () => 1));
 
-            airPurifier
-                .getCharacteristic(this.characteristicRegistry.RotationSpeed)
-                .setProps({
+            const rotationSpeedCharacteristic = airPurifier.getCharacteristic(
+                this.characteristicRegistry.RotationSpeed
+            );
+            if (!this.config.percentSpeed) {
+                rotationSpeedCharacteristic.setProps({
                     minValue: 0,
-                    maxValue: Math.min(this.speedLimit, this.maxSpeed),
-                })
-                .on('get', callback => this.getState(callback, () => this.currentSpeed))
-                .on('set', async (value, callback) => {
+                    maxValue: this.maxSpeed,
+                    minStep: 1,
+                });
+            }
+
+            rotationSpeedCharacteristic
+                .on('get', callback => this.getState(callback, () => this.currentSpeedHomekit))
+                .on('set', async (homekitSpeed, callback) => {
                     try {
                         if (!this.isOnline) {
                             this.log.error(`Device ${this.name} (${this.id}) not reachable`);
                             return callback('Not reachable');
                         }
-                        if (value && value !== this.currentSpeed) {
-                            await this.setState({speed: value});
+                        const tionSpeed = this.getTionSpeed(homekitSpeed);
+                        if (tionSpeed && tionSpeed !== this.currentSpeed) {
+                            await this.setState({
+                                is_on: true,
+                                speed: tionSpeed || 1,
+                                speed_min_set: 0,
+                                speed_max_set: Math.min(this.speedLimit, this.maxSpeed),
+                                heater_enabled: this.isHeaterOn,
+                                t_set: this.targetTemperature,
+                                gate: this.airIntake,
+                            });
                         }
-                        this.currentSpeed = value || 1;
-                        if (this.currentSpeed !== value) {
-                            this.rollbackCharacteristic(
-                                airPurifier,
-                                this.characteristicRegistry.RotationSpeed,
-                                this.currentSpeed
-                            );
-                        }
+                        this.currentSpeed = tionSpeed || 1;
+                        this.currentSpeedHomekit = homekitSpeed;
+
                         callback();
                     } catch (err) {
                         this.log.error(err.message || err);
@@ -284,7 +309,7 @@ export class TionBreezer extends TionDeviceBase {
 
                 airPurifier[action](this.characteristicRegistry.TargetAirPurifierState, 1);
 
-                airPurifier[action](this.characteristicRegistry.RotationSpeed, this.currentSpeed);
+                airPurifier[action](this.characteristicRegistry.RotationSpeed, this.currentSpeedHomekit);
             }
 
             const filter = accessory.getService(this.serviceRegistry.FilterMaintenance);
@@ -327,8 +352,12 @@ export class TionBreezer extends TionDeviceBase {
         this.isOnline = device.is_online;
 
         this.isOn = device.data.is_on || false;
-        this.currentSpeed = device.data.speed || 1;
         this.speedLimit = device.data.speed_limit || this.maxSpeed;
+        const newCurrentSpeed = device.data.speed || 1;
+        if (newCurrentSpeed !== this.currentSpeed) {
+            this.currentSpeedHomekit = this.getHomekitSpeed(newCurrentSpeed);
+        }
+        this.currentSpeed = newCurrentSpeed;
 
         if (this.isHeaterInstalled) {
             this.isHeaterOn = device.data.heater_enabled || false;
@@ -350,5 +379,21 @@ export class TionBreezer extends TionDeviceBase {
         this.firstParse = false;
 
         return true;
+    }
+
+    private getHomekitSpeed(tionSpeed: number): number {
+        if (this.config.percentSpeed) {
+            return Math.trunc(this.speedTick * tionSpeed * 100);
+        } else {
+            return tionSpeed;
+        }
+    }
+
+    private getTionSpeed(homekitSpeed): number {
+        if (this.config.percentSpeed) {
+            return Math.ceil(homekitSpeed / 100 / this.speedTick);
+        } else {
+            return homekitSpeed;
+        }
     }
 }

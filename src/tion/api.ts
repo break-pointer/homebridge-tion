@@ -151,7 +151,13 @@ export class TionApi implements ITionApi {
                             );
                             await new Promise(resolve => setTimeout(resolve, internalServerErrorAttempts * 500));
                         } else {
-                            throw new Error(`TionApi - error ${result.status} ${result.statusText}`);
+                            let payload: Buffer | null = null;
+                            try {
+                                payload = await result.buffer();
+                            } catch {
+                                // relax lint
+                            }
+                            throw new Error(`TionApi - error ${result.status} ${result.statusText} ${payload?.toString()}`);
                         }
                     } catch (err) {
                         if (
