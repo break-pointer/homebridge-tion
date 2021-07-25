@@ -121,6 +121,7 @@ export class TionAuthApi implements ITionAuthApi {
             }
         } catch (err) {
             this.log.error('TionAuthApi._internalAuthenticate: ', err.message);
+            this.log.debug('TionAuthApi._internalAuthenticate: ', err);
             throw err;
         }
     }

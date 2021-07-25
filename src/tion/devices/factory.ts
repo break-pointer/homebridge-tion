@@ -10,6 +10,7 @@ import {TionCO2Plus} from './co2plus';
 
 enum SupportedDeviceTypes {
     MagicAirStation = 'co2mb',
+    Breezer4S = 'breezer4',
     Breezer3S = 'breezer3',
     BreezerO2 = 'tionO2Rf',
     CO2Plus = 'co2Plus',
@@ -61,6 +62,7 @@ export class TionDevicesFactory implements ITionDevicesFactory {
     private createDevice(device: IDevice): TionDeviceBase | null {
         switch (device.type) {
             default:
+                this.log.warn(`Unsupported device type ${device.type}. Please contact developer to implement device.`);
                 return null;
             case SupportedDeviceTypes.MagicAirStation:
                 return new TionMagicAirStation(
@@ -71,6 +73,7 @@ export class TionDevicesFactory implements ITionDevicesFactory {
                     this.serviceRegistry,
                     this.characteristicRegistry
                 );
+            case SupportedDeviceTypes.Breezer4S:
             case SupportedDeviceTypes.Breezer3S:
             case SupportedDeviceTypes.BreezerO2:
                 return new TionBreezer(

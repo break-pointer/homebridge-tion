@@ -12,6 +12,7 @@
 | Модель |
 |--------|
 | [Базовая станция MagicAir](https://tion.ru/product/magicair/) |
+| [Бризер Тион 4S](https://tion.ru/product/breezer-tion-4s/) |
 | [Бризер Тион 3S](https://tion.ru/product/breezer-tion-3s/) |
 | [Бризер Тион O2](https://tion.ru/product/breezer-tion-o2/) |
 | [Модуль CO2](https://tion.ru/product/co2plus/) |
