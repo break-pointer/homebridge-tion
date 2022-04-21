@@ -15,6 +15,7 @@ describe('Test Platform Config', () => {
             co2Threshold: 799,
             apiRequestTimeout: 1001,
             percentSpeed: true,
+            getStateDebounce: 5000
         });
     });
 
@@ -42,7 +43,8 @@ describe('Test Platform Config', () => {
             name: 'Tion',
             co2Threshold: 800,
             apiRequestTimeout: 1500,
-            percentSpeed: false
+            percentSpeed: false,
+            getStateDebounce: 5000
         });
     });
 });

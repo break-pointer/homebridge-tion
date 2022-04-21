@@ -9,17 +9,14 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx}": [
+    "src/**/*.ts": [
       "prettier --write --config ./.prettierrc",
       "tslint --fix --project ./tsconfig.json"
-    ],
-    "src/**/*.{css,scss}": [
-      "prettier --write --config ./.prettierrc"
     ]
   },
   "scripts": {
-    "dev": "tsc -w",
-    "type-check": "tsc --skipLibCheck",
+    "dev": "ttsc -w",
+    "type-check": "ttsc --skipLibCheck",
     "lint": "tslint 'src/**/*.ts' --project ./tsconfig.json",
     "prettier": "prettier --write --config ./.prettierrc src/**/*.ts",
     "test": "jest",
@@ -58,26 +55,30 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ]
   },
   "devDependencies": {
-    "@types/jest": "^26.0.23",
-    "@types/node": "^12.7.4",
-    "@types/node-fetch": "^2.5.10",
+    "@types/jest": "^26.0.24",
+    "@types/node": "^12.20.43",
+    "@types/node-fetch": "^2.5.12",
     "ghooks": "^2.0.4",
     "jest": "^26.6.3",
-    "lint-staged": "^10.5.1",
-    "prettier": "^2.3.0",
+    "lint-staged": "^10.5.4",
+    "prettier": "^2.5.1",
     "ts-jest": "^26.5.6",
-    "ts-node": "^8.4.1",
+    "ts-node": "^8.10.2",
     "ts-transformer-imports": "^0.4.3",
-    "tslint": "^5.20.0",
+    "tslint": "^5.20.1",
     "tslint-config-prettier": "^1.18.0",
-    "tslint-plugin-prettier": "^2.0.1",
-    "ttypescript": "^1.5.12",
-    "typescript": "^4.2.4"
+    "tslint-plugin-prettier": "^2.3.0",
+    "ttypescript": "^1.5.13",
+    "typescript": "^4.5.5"
   },
   "dependencies": {
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.7"
   }
 }

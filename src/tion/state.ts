@@ -101,6 +101,9 @@ export interface IDeviceData {
     data_valid?: boolean;
     heater_installed?: boolean;
     heater_enabled?: boolean;
+    heater_type?: string; // new in Tion 4S
+    heater_mode?: string; // new in Tion 4S
+    heater_power?: number; // new in Tion 4S
     speed?: number;
     speed_m3h?: number;
     speed_max_set?: number;
@@ -133,7 +136,7 @@ export interface IPairing {
 }
 
 export interface IMode {
-    current: string;
+    current: 'auto' | 'manual';
     auto_set: IAutoSet;
 }
 

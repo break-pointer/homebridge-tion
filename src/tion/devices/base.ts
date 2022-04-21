@@ -1,10 +1,11 @@
 import {ILog, IHomebridgeAccessory} from 'homebridge/framework';
 import {ITionPlatformConfig} from 'platform_config';
 import {ITionApi} from 'tion/api';
-import {ILocation, IDevice} from 'tion/state';
-import {ICommand} from 'tion/command';
+import {ILocation, IDevice, IZone} from 'tion/state';
+import {IDeviceCommand} from 'tion/command';
 
 export abstract class TionDeviceBase {
+    public readonly zoneId: string;
     public readonly id: string;
     public readonly name: string;
     public readonly modelName: string;
@@ -24,12 +25,14 @@ export abstract class TionDeviceBase {
 
     constructor(
         device: IDevice,
+        zone: IZone,
         log: ILog,
         config: ITionPlatformConfig,
         api: ITionApi,
         serviceRegistry: any,
         characteristicRegistry: any
     ) {
+        this.zoneId = zone.guid;
         this.id = device.guid;
         this.name = device.name;
         this.modelName = device.type;
@@ -52,31 +55,37 @@ export abstract class TionDeviceBase {
 
     protected abstract parseState(state: ILocation): boolean;
 
-    protected findDeviceInState(state: ILocation): IDevice {
-        let ret: any;
-        state.zones.forEach(zone => {
-            if (ret) {
+    protected findDeviceInState(state: ILocation): {device: IDevice| null; zone: IZone| null} {
+        let device: IDevice | null = null;
+        let zone: IZone | null = null;
+
+        state.zones.forEach(z => {
+            if (device) {
                 return;
             }
-            zone.devices.forEach(d => {
-                if (ret) {
+            z.devices.forEach(d => {
+                if (device) {
                     return;
                 }
                 if (d.guid === this.id) {
-                    ret = d;
+                    device = d;
+                    zone = z;
                 }
             });
         });
-        if (!ret) {
+        if (!device) {
             this.log.error(`Device ${this.name} (${this.id}) not found in remote state`);
         }
-        return ret;
+        return {
+            device, 
+            zone,
+        };
     }
 
-    protected async setState(command: ICommand): Promise<void> {
+    protected async setState(command: IDeviceCommand): Promise<void> {
         try {
             this.isCommandRunning = true;
-            await this.api.execCommand(this.id, command);
+            await this.api.execDeviceCommand(this.id, command);
         } finally {
             this.isCommandRunning = false;
         }

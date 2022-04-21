@@ -71,7 +71,7 @@ export class TionCO2Plus extends TionDeviceBase {
     }
 
     protected parseState(state: ILocation): boolean {
-        const device: IDevice = this.findDeviceInState(state);
+        const {device} = this.findDeviceInState(state);
         if (!device) {
             return false;
         }

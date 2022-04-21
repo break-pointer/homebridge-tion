@@ -135,7 +135,7 @@ export class TionFilesystemAuthStorage implements ITionAuthStorage {
         this.log = log;
         this.basePath = basePath;
         if (!fs.existsSync(basePath)) {
-                fs.mkdirSync(basePath, { recursive: true });
+            fs.mkdirSync(basePath, {recursive: true});
         }
     }
 

@@ -7,14 +7,7 @@ import {TionDeviceBase} from './base';
 import {TionMagicAirStation} from './station';
 import {TionBreezer} from './breezer';
 import {TionCO2Plus} from './co2plus';
-
-enum SupportedDeviceTypes {
-    MagicAirStation = 'co2mb',
-    Breezer4S = 'breezer4',
-    Breezer3S = 'breezer3',
-    BreezerO2 = 'tionO2Rf',
-    CO2Plus = 'co2Plus',
-}
+import {SupportedDeviceTypes} from './supported_device_types';
 
 export interface ITionDevicesFactory {
     createDevices(existingDevices: TionDeviceBase[], location: ILocation): TionDeviceBase[];
@@ -46,7 +39,7 @@ export class TionDevicesFactory implements ITionDevicesFactory {
             const zoneDevices: TionDeviceBase[] = [];
             zone.devices.forEach(d => {
                 if (!existingDevices.find(ex => ex.id === d.guid)) {
-                    const device = this.createDevice(d);
+                    const device = this.createDevice(d, zone);
                     if (device) {
                         zoneDevices.push(device);
                     }
@@ -59,14 +52,17 @@ export class TionDevicesFactory implements ITionDevicesFactory {
         return existingDevices.concat(devices);
     }
 
-    private createDevice(device: IDevice): TionDeviceBase | null {
+    private createDevice(device: IDevice, zone: IZone): TionDeviceBase | null {
         switch (device.type) {
             default:
-                this.log.warn(`Unsupported device type ${device.type}. Please contact developer to implement device.`);
+                this.log.warn(
+                    `Unsupported device type ${device.type}. Please contact plugin developer to add device support.`
+                );
                 return null;
             case SupportedDeviceTypes.MagicAirStation:
                 return new TionMagicAirStation(
                     device,
+                    zone,
                     this.log,
                     this.config,
                     this.api,
@@ -78,6 +74,7 @@ export class TionDevicesFactory implements ITionDevicesFactory {
             case SupportedDeviceTypes.BreezerO2:
                 return new TionBreezer(
                     device,
+                    zone,
                     this.log,
                     this.config,
                     this.api,
@@ -87,6 +84,7 @@ export class TionDevicesFactory implements ITionDevicesFactory {
             case SupportedDeviceTypes.CO2Plus:
                 return new TionCO2Plus(
                     device,
+                    zone,
                     this.log,
                     this.config,
                     this.api,

@@ -1,7 +1,5 @@
-.vscode
 .idea
 dist
-test/data/*
 
 # Logs
 logs
