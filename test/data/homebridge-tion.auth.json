@@ -1,0 +1,12 @@
+{
+    "access_token": "71f58fa501d7491fb319bc1594fdbcd2691cd27edca64d218e74ea401a0fc56d",
+    "expires_in": 1296000,
+    "token_type": "Bearer",
+    "refresh_token": "0c9dc4f6440c4c83b87fd5a91445a643dbd2a836858847938d0dfee54d7da87a",
+    "scope": "ma-account ma-device ma-firmware offline_access",
+    "username": "admin@google.com",
+    "user_guid": "37b6c2bc-5b71-4e5e-a44a-1cd890783e77",
+    "client_id": "a750d720-e146-47b0-b414-35e3b1dd7862",
+    ".issued": "2020-11-19T14:11:22.1376115Z",
+    ".expires": "2020-12-04T14:11:22.1376115Z"
+}

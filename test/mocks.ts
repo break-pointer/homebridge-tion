@@ -33,6 +33,7 @@ export class MockPlatformConfig implements ITionPlatformConfig {
     userName: string;
     password: string;
     percentSpeed: boolean;
+    getStateDebounce: number;
 
     constructor() {
         this.homeName = 'Home';
@@ -41,15 +42,20 @@ export class MockPlatformConfig implements ITionPlatformConfig {
         this.co2Threshold = 799;
         this.apiRequestTimeout = 1001;
         this.percentSpeed = true;
+        this.getStateDebounce = 5000;
     }
 }
 
 export class MockPlatformAccessory {
     private services: MockServiceBase[];
+    private displayName: string;
+    private UUID: string;
 
-    constructor() {
+    constructor(displayName: string, uuid: string) {
+        this.displayName = displayName;
+        this.UUID = uuid;
         this.services = [];
-        this.services.push(new AccessoryInformation(''));
+        this.services.push(new AccessoryInformation(displayName));
     }
 
     addService(service: typeof MockServiceBase, name: string): MockServiceBase {
@@ -61,7 +67,8 @@ export class MockPlatformAccessory {
     getService(sClass: typeof MockServiceBase): MockServiceBase | undefined {
         const ret = this.services.find(s => s instanceof sClass);
         if (!ret) {
-            console.log(`Accessory ${this} is being requested service ${sClass}, but none registered`);
+            const firstService = this.services.find(s => !(s instanceof AccessoryInformation));
+            console.log(`Accessory ${this.displayName} with main service ${firstService!.name} is being requested service ${sClass.toString().split(' ')[1]}, but none registered`);
         }
         return ret;
     }
@@ -130,6 +137,8 @@ class FilterMaintenance extends MockServiceBase {}
 
 class HeaterCooler extends MockServiceBase {}
 
+class Switch extends MockServiceBase {}
+
 class MockCharacteristicBase {
     value: string | number;
     events: {};
@@ -194,6 +203,8 @@ class TargetHeaterCoolerState extends MockCharacteristicBase {}
 
 class HeatingThresholdTemperature extends MockCharacteristicBase {}
 
+class On extends MockCharacteristicBase {}
+
 export class MockHomebridge implements IHomebridge {
     public hap = {
         Service: {
@@ -204,6 +215,7 @@ export class MockHomebridge implements IHomebridge {
             AirPurifier,
             FilterMaintenance,
             HeaterCooler,
+            Switch,
         },
         Characteristic: {
             Manufacturer,
@@ -225,6 +237,7 @@ export class MockHomebridge implements IHomebridge {
             CurrentHeaterCoolerState,
             TargetHeaterCoolerState,
             HeatingThresholdTemperature,
+            On,
         },
         uuid: {
             generate: (x: string) =>

@@ -32,7 +32,7 @@ describe('Test Tion Platform', () => {
     beforeEach(async () => {
         [homebridgeApi, platform] = setup();
         homebridgeApi.send("didFinishLaunching");
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
     });
 
     afterEach(() => {

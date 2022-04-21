@@ -1,6 +1,6 @@
 import {IHomebridgeAccessory} from 'homebridge/framework';
 import {TionDeviceBase} from './base';
-import {ILocation, IDevice} from 'tion/state';
+import {ILocation} from 'tion/state';
 
 export class TionMagicAirStation extends TionDeviceBase {
     public co2Level: number = 0;
@@ -71,7 +71,7 @@ export class TionMagicAirStation extends TionDeviceBase {
     }
 
     protected parseState(state: ILocation): boolean {
-        const device: IDevice = this.findDeviceInState(state);
+        const {device} = this.findDeviceInState(state);
         if (!device) {
             return false;
         }

@@ -120,6 +120,12 @@ export class AccessoriesFactory implements IAccessoriesFactory {
 
         airPurifier.addLinkedService(filter);
 
+        if (device.isAirIntakeInstalled) {
+            breezerAccessory
+                .addService(this.serviceRegistry.Switch, 'Рециркуляция')
+                .setCharacteristic(this.characteristicRegistry.On, false);
+        }
+
         if (device.isHeaterInstalled) {
             breezerAccessory
                 .addService(this.serviceRegistry.HeaterCooler, 'Нагрев')

@@ -12,6 +12,7 @@ export interface ITionPlatformConfig extends IHomebridgePlatformConfig {
     co2Threshold: number;
     apiRequestTimeout: number;
     percentSpeed: boolean;
+    getStateDebounce: number;
 }
 
 export function validate(log: ILog, config: ITionPlatformConfig): boolean {
@@ -80,6 +81,18 @@ export function sanitize(log: ILog, config: ITionPlatformConfig): ITionPlatformC
         }
     } else {
         Object.assign(config, {percentSpeed: false});
+    }
+    if ('getStateDebounce' in config) {
+        if (
+            !Number.isInteger(config.getStateDebounce) ||
+            config.getStateDebounce < 1000 ||
+            config.getStateDebounce > 30000
+        ) {
+            log.warn(`config.getStateDebounce has incompatible value, setting 5000`);
+            Object.assign(config, {getStateDebounce: 5000});
+        }
+    } else {
+        Object.assign(config, {getStateDebounce: 5000});
     }
     return config;
 }

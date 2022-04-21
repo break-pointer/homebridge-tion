@@ -5,7 +5,7 @@ import {ILog} from 'homebridge/framework';
 import {ITionAuthApi} from './auth';
 import {ILocation} from './state';
 import {ITionPlatformConfig} from 'platform_config';
-import {ICommand, ICommandResult} from './command';
+import {IDeviceCommand, ICommandResult, IZoneCommand} from './command';
 
 enum AuthState {
     NoToken = 'no_token',
@@ -16,7 +16,8 @@ enum AuthState {
 export interface ITionApi {
     init(): Promise<any>;
     getSystemState(): Promise<ILocation>;
-    execCommand(deviceId: string, payload: ICommand): Promise<ICommandResult>;
+    execDeviceCommand(deviceId: string, payload: IDeviceCommand): Promise<ICommandResult>;
+    execZoneCommand(zoneId: string, payload: IZoneCommand): Promise<ICommandResult>;
 }
 
 export class TionApi implements ITionApi {
@@ -28,11 +29,17 @@ export class TionApi implements ITionApi {
     private readonly config: ITionPlatformConfig;
 
     private stateRequest?: Promise<ILocation[]>;
+    private stateResult?: ILocation[];
+
+    private lastStateRequestTimestamp: number;
+    private lastCommandTimestamp: number;
 
     constructor(log: ILog, config: ITionPlatformConfig, authApi: ITionAuthApi) {
         this.log = log;
         this.config = config;
         this.authApi = authApi;
+        this.lastStateRequestTimestamp = 0;
+        this.lastCommandTimestamp = 0;
     }
 
     public async init(): Promise<any> {
@@ -40,48 +47,69 @@ export class TionApi implements ITionApi {
     }
 
     public async getSystemState(): Promise<ILocation> {
+        // force last received state if it's not older than config.getStateDebounce
+        // and there was no commands since it was received
+        const now = Date.now();
+        if (
+            this.stateResult &&
+            now < this.lastStateRequestTimestamp + this.config.getStateDebounce &&
+            this.lastCommandTimestamp < this.lastStateRequestTimestamp
+        ) {
+            return this.parseStateResult(this.stateResult);
+        }
+
+        // debounce sequential state retrieval, while HTTP request is running
         let firstRequest = false;
         if (!this.stateRequest) {
             this.log.debug('Loading system state');
-            this.stateRequest = this._internalRequest('get', '/location', {
+            this.lastCommandTimestamp = Date.now();
+            this.stateRequest = this.apiRequest('get', '/location', {
                 timeout: this.config.apiRequestTimeout,
             });
             firstRequest = true;
         }
-        let stateResult: ILocation[];
+        let stateResult: ILocation[] | undefined;
         try {
             stateResult = await this.stateRequest;
         } finally {
             if (firstRequest) {
                 this.stateRequest = undefined;
+                this.stateResult = stateResult;
             }
         }
-        let ret: ILocation | null = null;
-        if (this.config.homeName) {
-            const lower = this.config.homeName.toLowerCase().trim();
-            const location = stateResult.find(loc => loc.name.toLowerCase().trim() === lower);
-            if (location) {
-                ret = location;
-            } else {
-                this.log.warn(`Location ${this.config.homeName} not found, using first suitable`);
-            }
-        }
-        if (!ret) {
-            ret = stateResult.find(loc => loc.zones.length) || stateResult[0];
-        }
-
-        return ret!;
+        return this.parseStateResult(stateResult);
     }
 
-    public async execCommand(deviceId: string, payload: ICommand): Promise<ICommandResult> {
-        this.log.debug(`TionApi.execCommand(deviceId = ${deviceId}, payload = ${JSON.stringify(payload)})`);
+    public async execDeviceCommand(deviceId: string, payload: IDeviceCommand): Promise<ICommandResult> {
+        return this.execCommandInternal(deviceId, 'device', payload);
+    }
+
+    public async execZoneCommand(zoneId: string, payload: IZoneCommand): Promise<ICommandResult> {
+        return this.execCommandInternal(zoneId, 'zone', payload);
+    }
+
+    private async execCommandInternal(
+        objectId: string,
+        commandType: 'device' | 'zone',
+        payload: IDeviceCommand | IZoneCommand
+    ): Promise<ICommandResult> {
+        this.log.debug(
+            `TionApi.execCommand(objectId = ${objectId}, commandType: ${commandType}, payload = ${JSON.stringify(
+                payload
+            )})`
+        );
+        this.lastCommandTimestamp = Date.now();
         try {
-            let result: ICommandResult = await this._internalRequest('post', `/device/${deviceId}/mode`, {
+            let result: ICommandResult = await this.apiRequest('post', `/${commandType}/${objectId}/mode`, {
                 body: payload,
                 timeout: this.config.apiRequestTimeout,
             });
             const commandId = result.task_id;
-            this.log.debug(`TionApi.execCommand(commandId = ${commandId}, result = ${JSON.stringify(result)})`);
+            this.log.debug(
+                `TionApi.execCommand(objectId = ${objectId}, commandType: ${commandType}, result = ${JSON.stringify(
+                    result
+                )})`
+            );
             let attempts = 0;
             while (result.status !== 'completed' && attempts++ < 4) {
                 switch (result.status) {
@@ -93,7 +121,7 @@ export class TionApi implements ITionApi {
                     case 'delivered':
                     case 'queued':
                         await new Promise(resolve => setTimeout(resolve, attempts * 100));
-                        result = await this._internalRequest('get', `/task/${commandId}`, {
+                        result = await this.apiRequest('get', `/task/${commandId}`, {
                             timeout: this.config.apiRequestTimeout,
                         });
                         this.log.debug(`TionApi.execCommand(result = ${JSON.stringify(result)})`);
@@ -115,7 +143,7 @@ export class TionApi implements ITionApi {
         }
     }
 
-    private async _internalRequest(method: 'get' | 'post', endpoint: string, options: any): Promise<any> {
+    private async apiRequest(method: 'get' | 'post', endpoint: string, options: any): Promise<any> {
         let accessToken = this.authApi.getAccessToken();
         let state: AuthState = accessToken ? AuthState.HasToken : AuthState.NoToken;
         let internalServerErrorAttempts = 0;
@@ -157,7 +185,9 @@ export class TionApi implements ITionApi {
                             } catch {
                                 // relax lint
                             }
-                            throw new Error(`TionApi - error ${result.status} ${result.statusText} ${payload?.toString()}`);
+                            throw new Error(
+                                `TionApi - error ${result.status} ${result.statusText} ${payload?.toString()}`
+                            );
                         }
                     } catch (err) {
                         if (
@@ -209,5 +239,23 @@ export class TionApi implements ITionApi {
                     break;
             }
         }
+    }
+
+    private parseStateResult(stateResult: ILocation[]): ILocation {
+        let ret: ILocation | undefined;
+        if (this.config.homeName) {
+            const lower = this.config.homeName.toLowerCase().trim();
+            const location = stateResult.find(loc => loc.name.toLowerCase().trim() === lower);
+            if (location) {
+                ret = location;
+            } else {
+                this.log.warn(`Location ${this.config.homeName} not found, using first suitable`);
+            }
+        }
+        if (!ret) {
+            ret = stateResult.find(loc => loc.zones.length) || stateResult[0];
+        }
+
+        return ret!;
     }
 }
