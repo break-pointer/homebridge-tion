@@ -134,6 +134,9 @@ export class TionFilesystemAuthStorage implements ITionAuthStorage {
     constructor(log: ILog, basePath: string) {
         this.log = log;
         this.basePath = basePath;
+        if (!fs.existsSync(basePath)) {
+                fs.mkdirSync(basePath, { recursive: true });
+        }
     }
 
     public async save(authData: ITionAuthData): Promise<void> {
