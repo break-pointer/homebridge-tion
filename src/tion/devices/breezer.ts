@@ -23,7 +23,7 @@ export class TionBreezer extends TionDeviceBase {
     public filterLifeLevel: number;
 
     public readonly isAirIntakeInstalled: boolean;
-    public airIntake: GateState;
+    public airIntake: GateState | undefined;
 
     private readonly maxSpeed: number;
     private readonly maxTargetTemperature: number;
@@ -49,7 +49,7 @@ export class TionBreezer extends TionDeviceBase {
 
         if (device.data.heater_installed !== undefined) {
             // o2 and 3s
-            this.isHeaterInstalled = !!device.data.heater_installed;
+            this.isHeaterInstalled = Boolean(device.data.heater_installed);
         } else if (device.data.heater_type !== undefined) {
             // 4s
             this.isHeaterInstalled = true;
@@ -70,7 +70,7 @@ export class TionBreezer extends TionDeviceBase {
         this.isAirIntakeInstalled = [SupportedDeviceTypes.Breezer3S, SupportedDeviceTypes.Breezer4S].includes(
             this.modelName as any
         );
-        this.airIntake = GateState.Outside;
+        this.airIntake = this.getTionAirIntake(false);
 
         this.maxSpeed = device.max_speed || 0;
         this.maxTargetTemperature = device.t_max || 0;
@@ -353,6 +353,7 @@ export class TionBreezer extends TionDeviceBase {
                             return callback();
                         }
                         value = Boolean(value);
+                        const tionValue = this.getTionAirIntake(value);
                         if (value !== (this.airIntake === GateState.Inside)) {
                             if (this.isAuto) {
                                 await this.setAutoMode(false);
@@ -363,7 +364,7 @@ export class TionBreezer extends TionDeviceBase {
                                     this.currentSpeed,
                                     this.isHeaterOn,
                                     this.targetTemperature,
-                                    value ? GateState.Inside : GateState.Outside
+                                    tionValue
                                 )
                             );
                         }
@@ -373,7 +374,7 @@ export class TionBreezer extends TionDeviceBase {
                                 value ? 0 : this.isHeaterOn ? 1 : 0
                             );
                         }
-                        this.airIntake = value ? GateState.Inside : GateState.Outside;
+                        this.airIntake = tionValue;
                         callback();
                     } catch (err) {
                         this.log.error(err.message || err);
@@ -487,6 +488,7 @@ export class TionBreezer extends TionDeviceBase {
             ? device.data.filter_time_seconds / (device.data.filter_time_seconds + (device.data.run_seconds || 0))
             : 0;
 
+        // noinspection SuspiciousTypeOfGuard
         if (device.data.gate !== undefined && typeof device.data.gate === 'number') {
             this.airIntake = device.data.gate as GateState;
         }
@@ -519,7 +521,7 @@ export class TionBreezer extends TionDeviceBase {
         speed: number,
         isHeaterOn: boolean,
         temperature: number,
-        gate: GateState
+        gate: GateState | undefined
     ): IDeviceCommand {
         let heaterData: any = {};
         if (this.isHeaterInstalled) {
@@ -553,5 +555,20 @@ export class TionBreezer extends TionDeviceBase {
             co2: this.config.co2Threshold,
         });
         this.isAuto = isAuto;
+    }
+
+    private getTionAirIntake(isOn: boolean): GateState | undefined {
+        if (isOn) {
+            return GateState.Inside;
+        } else {
+            switch (this.modelName) {
+                default:
+                    return undefined;
+                case SupportedDeviceTypes.Breezer3S:
+                    return GateState.Outside3S;
+                case SupportedDeviceTypes.Breezer4S:
+                    return GateState.Outside4S;
+            }
+        }
     }
 }

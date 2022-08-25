@@ -26,6 +26,6 @@ export interface IZoneCommand {
 
 export enum GateState {
     Inside = 0,
-    Mixed = 1,
-    Outside = 2,
+    Outside3S = 2,
+    Outside4S = 1,
 }
