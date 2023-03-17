@@ -1,6 +1,6 @@
 {
   "name": "homebridge-tion",
-  "version": "1.0.22-0",
+  "version": "1.0.22-1",
   "description": "Homebridge plugin to control Tion breezers",
   "main": "./dist/index.js",
   "config": {
@@ -16,8 +16,9 @@
   },
   "scripts": {
     "dev": "ttsc -w",
-    "type-check": "ttsc --skipLibCheck",
+    "type-check": "ttsc --skipLibCheck --noEmit",
     "lint": "tslint 'src/**/*.ts' --project ./tsconfig.json",
+    "lint-fix": "tslint 'src/**/*.ts' --project ./tsconfig.json --fix",
     "prettier": "prettier --write --config ./.prettierrc src/**/*.ts",
     "test": "jest",
     "build": "ttsc",

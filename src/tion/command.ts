@@ -1,10 +1,33 @@
+export enum CommandStatus {
+    Queued = 'queued',
+    Delivered = 'delivered',
+    Completed = 'completed',
+}
+
 export interface ICommandResult {
     task_id: string;
-    status: 'queued' | 'delivered' | 'completed';
+    status: CommandStatus;
     type: 'setDeviceMode';
     target_guid: string;
     user_guid: string;
     email: string;
+}
+
+export enum HeaterMode4S {
+    On = 'heat',
+    Off = 'maintenance',
+}
+
+export enum GateState {
+    Inside3S = 0,
+    Outside3S = 2,
+    Inside4S = 1,
+    Outside4S = 0,
+}
+
+export enum CommandType {
+    Device = 'device',
+    Zone = 'zone',
 }
 
 export interface IDeviceCommand {
@@ -13,19 +36,17 @@ export interface IDeviceCommand {
     speed_min_set: number;
     speed_max_set: number;
     heater_enabled?: boolean;
-    heater_mode?: string; // new in Tion 4S
-    heater_power?: number; // new in Tion 4S
+    heater_mode?: HeaterMode4S; // new in Tion 4S
     t_set?: number;
     gate?: GateState;
 }
 
-export interface IZoneCommand {
-    mode: 'auto' | 'manual';
-    co2: number;
+export enum ZoneMode {
+    Auto = 'auto',
+    Manual = 'manual',
 }
 
-export enum GateState {
-    Inside = 0,
-    Outside3S = 2,
-    Outside4S = 1,
+export interface IZoneCommand {
+    mode: ZoneMode;
+    co2: number;
 }

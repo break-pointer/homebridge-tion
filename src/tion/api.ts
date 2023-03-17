@@ -5,7 +5,7 @@ import {ILog} from 'homebridge/framework';
 import {ITionAuthApi} from './auth';
 import {ILocation} from './state';
 import {ITionPlatformConfig} from 'platform_config';
-import {IDeviceCommand, ICommandResult, IZoneCommand} from './command';
+import {CommandStatus, CommandType, ICommandResult, IDeviceCommand, IZoneCommand} from './command';
 
 enum AuthState {
     NoToken = 'no_token',
@@ -48,7 +48,7 @@ export class TionApi implements ITionApi {
 
     public async getSystemState(): Promise<ILocation> {
         // force last received state if it's not older than config.getStateDebounce
-        // and there was no commands since it was received
+        // and there were no commands since it was received
         const now = Date.now();
         if (
             this.stateResult &&
@@ -62,7 +62,7 @@ export class TionApi implements ITionApi {
         let firstRequest = false;
         if (!this.stateRequest) {
             this.log.debug('Loading system state');
-            this.lastCommandTimestamp = Date.now();
+            this.lastStateRequestTimestamp = Date.now();
             this.stateRequest = this.apiRequest('get', '/location', {
                 timeout: this.config.apiRequestTimeout,
             });
@@ -81,16 +81,16 @@ export class TionApi implements ITionApi {
     }
 
     public async execDeviceCommand(deviceId: string, payload: IDeviceCommand): Promise<ICommandResult> {
-        return this.execCommandInternal(deviceId, 'device', payload);
+        return this.execCommandInternal(deviceId, CommandType.Device, payload);
     }
 
     public async execZoneCommand(zoneId: string, payload: IZoneCommand): Promise<ICommandResult> {
-        return this.execCommandInternal(zoneId, 'zone', payload);
+        return this.execCommandInternal(zoneId, CommandType.Zone, payload);
     }
 
     private async execCommandInternal(
         objectId: string,
-        commandType: 'device' | 'zone',
+        commandType: CommandType,
         payload: IDeviceCommand | IZoneCommand
     ): Promise<ICommandResult> {
         this.log.debug(
@@ -111,15 +111,15 @@ export class TionApi implements ITionApi {
                 )})`
             );
             let attempts = 0;
-            while (result.status !== 'completed' && attempts++ < 4) {
+            while (result.status !== CommandStatus.Completed && attempts++ < 4) {
                 switch (result.status) {
                     default:
                         this.log.error(`Unknown command status`);
                         this.log.error(result);
+                        // noinspection ExceptionCaughtLocallyJS
                         throw new Error('Status');
-                        break;
-                    case 'delivered':
-                    case 'queued':
+                    case CommandStatus.Delivered:
+                    case CommandStatus.Queued:
                         await new Promise(resolve => setTimeout(resolve, attempts * 100));
                         result = await this.apiRequest('get', `/task/${commandId}`, {
                             timeout: this.config.apiRequestTimeout,
@@ -185,6 +185,7 @@ export class TionApi implements ITionApi {
                             } catch {
                                 // relax lint
                             }
+                            // noinspection ExceptionCaughtLocallyJS
                             throw new Error(
                                 `TionApi - error ${result.status} ${result.statusText} ${payload?.toString()}`
                             );
