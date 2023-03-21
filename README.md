@@ -27,9 +27,9 @@
 - сигнализация превышения допустимого уровня CO2
 - мониторинг температуры уличного воздуха
 
-| ![Демо](docs/homekit-demo.png  | width=200) | ![Демо](docs/homekit-demo1.png | width=200) | ![Демо](docs/homekit-demo2.png  | width=200) |
+| ![Демо](docs/homekit-demo.png) | ![Демо](docs/homekit-demo1.png) | ![Демо](docs/homekit-demo2.png) |
 | ------------------------------------------- | ------------------------------------------- | -------------------------------------------- |
-| ![Демо](docs/homekit-demo3.png | width=200) | ![Демо](docs/homekit-demo4.png | width=200) |
+| ![Демо](docs/homekit-demo3.png) | ![Демо](docs/homekit-demo4.png) |
 
 ## Установка
 
