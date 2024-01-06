@@ -78,6 +78,10 @@ export class AccessoriesFactory implements IAccessoriesFactory {
             .addService(this.serviceRegistry.HumiditySensor, 'Влажность')
             .setCharacteristic(this.characteristicRegistry.CurrentRelativeHumidity, 0);
 
+        accessory
+            .addService(this.serviceRegistry.Switch, 'Подсветка')
+            .setCharacteristic(this.characteristicRegistry.On, false);
+
         ret.push(accessory);
 
         return ret;

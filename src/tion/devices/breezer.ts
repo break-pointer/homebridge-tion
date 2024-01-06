@@ -1,7 +1,7 @@
 import {IHomebridgeAccessory, ILog} from 'homebridge/framework';
 import {TionDeviceBase} from './base';
 import {IDevice, IDeviceData, ILocation, IZone, Mode} from 'tion/state';
-import {GateState, HeaterMode4S, IDeviceCommand, ZoneMode} from 'tion/command';
+import {CommandType, GateState, HeaterMode4S, IBreezerCommand, ZoneMode} from 'tion/command';
 import {ITionPlatformConfig} from 'platform_config';
 import {ITionApi} from 'tion/api';
 import {SupportedDeviceTypes} from './supported_device_types';
@@ -109,15 +109,13 @@ export class TionBreezer extends TionDeviceBase {
                             if (this.isAuto) {
                                 await this.setAutoMode(false);
                             }
-                            await this.setState(
-                                this.getCommandData(
-                                    value,
-                                    this.currentSpeed,
-                                    this.isHeaterOn,
-                                    this.targetTemperature,
-                                    this.isAirIntakeOn
-                                )
-                            );
+                            await this.setState(CommandType.Mode, this.getCommandData(
+                                value,
+                                this.currentSpeed,
+                                this.isHeaterOn,
+                                this.targetTemperature,
+                                this.isAirIntakeOn
+                            ));
                         }
                         this.isOn = value;
                         airPurifier.setCharacteristic(
@@ -195,15 +193,13 @@ export class TionBreezer extends TionDeviceBase {
                             if (this.isAuto) {
                                 await this.setAutoMode(false);
                             }
-                            await this.setState(
-                                this.getCommandData(
-                                    this.isOn,
-                                    tionSpeed || 1,
-                                    this.isHeaterOn,
-                                    this.targetTemperature,
-                                    this.isAirIntakeOn
-                                )
-                            );
+                            await this.setState(CommandType.Mode, this.getCommandData(
+                                this.isOn,
+                                tionSpeed || 1,
+                                this.isHeaterOn,
+                                this.targetTemperature,
+                                this.isAirIntakeOn
+                            ));
                         }
                         this.currentSpeed = tionSpeed || 1;
                         this.currentSpeedHomekit = homekitSpeed;
@@ -245,15 +241,13 @@ export class TionBreezer extends TionDeviceBase {
                             if (this.isAuto) {
                                 await this.setAutoMode(false);
                             }
-                            await this.setState(
-                                this.getCommandData(
-                                    this.isOn,
-                                    this.currentSpeed,
-                                    value,
-                                    this.targetTemperature,
-                                    this.isAirIntakeOn
-                                )
-                            );
+                            await this.setState(CommandType.Mode, this.getCommandData(
+                                this.isOn,
+                                this.currentSpeed,
+                                value,
+                                this.targetTemperature,
+                                this.isAirIntakeOn
+                            ));
                         }
                         this.isHeaterOn = value;
                         callback();
@@ -306,15 +300,13 @@ export class TionBreezer extends TionDeviceBase {
                             if (this.isAuto) {
                                 await this.setAutoMode(false);
                             }
-                            await this.setState(
-                                this.getCommandData(
-                                    this.isOn,
-                                    this.currentSpeed,
-                                    this.isHeaterOn,
-                                    value,
-                                    this.isAirIntakeOn
-                                )
-                            );
+                            await this.setState(CommandType.Mode, this.getCommandData(
+                                this.isOn,
+                                this.currentSpeed,
+                                this.isHeaterOn,
+                                value,
+                                this.isAirIntakeOn
+                            ));
                         }
                         this.targetTemperature = value;
                         callback();
@@ -358,15 +350,13 @@ export class TionBreezer extends TionDeviceBase {
                             if (this.isAuto) {
                                 await this.setAutoMode(false);
                             }
-                            await this.setState(
-                                this.getCommandData(
-                                    this.isOn,
-                                    this.currentSpeed,
-                                    this.isHeaterOn,
-                                    this.targetTemperature,
-                                    value
-                                )
-                            );
+                            await this.setState(CommandType.Mode, this.getCommandData(
+                                this.isOn,
+                                this.currentSpeed,
+                                this.isHeaterOn,
+                                this.targetTemperature,
+                                value
+                            ));
                         }
                         if (heater) {
                             heater.updateCharacteristic(
@@ -577,7 +567,7 @@ export class TionBreezer extends TionDeviceBase {
         isHeaterOn: boolean,
         temperature: number,
         isAirIntakeOn: boolean
-    ): IDeviceCommand {
+    ): IBreezerCommand {
         const heaterData = this.getTionHeaterData(isHeaterOn, temperature);
         const airIntakeData = this.getTionAirIntakeData(isAirIntakeOn);
 

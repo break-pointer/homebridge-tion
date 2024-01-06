@@ -1,4 +1,4 @@
-export type UuidGen = (...messages: any) => void;
+export type UuidGen = (seed: string) => string;
 
 export interface IHomebridge {
     hap: {

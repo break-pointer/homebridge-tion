@@ -14,7 +14,7 @@ describe('Test Tion API', () => {
     const authApi = new TionAuthApi(MockLog, config, authStorage);
     const api = new TionApi(MockLog, config, authApi);
 
-    test('It should login and recieve state', async () => {
+    test('It should login and receive state', async () => {
         await expect(api.init()).resolves.toBeUndefined();
         const systemState = await api.getSystemState();
         expect(systemState).toBeDefined();
