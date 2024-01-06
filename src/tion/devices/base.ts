@@ -2,7 +2,7 @@ import {ILog, IHomebridgeAccessory} from 'homebridge/framework';
 import {ITionPlatformConfig} from 'platform_config';
 import {ITionApi} from 'tion/api';
 import {ILocation, IDevice, IZone} from 'tion/state';
-import {IDeviceCommand} from 'tion/command';
+import {CommandType, IBreezerCommand, IStationCommand} from 'tion/command';
 
 export abstract class TionDeviceBase {
     public readonly zoneId: string;
@@ -82,10 +82,10 @@ export abstract class TionDeviceBase {
         };
     }
 
-    protected async setState(command: IDeviceCommand): Promise<void> {
+    protected async setState(commandType: CommandType, command: IBreezerCommand | IStationCommand): Promise<void> {
         try {
             this.isCommandRunning = true;
-            await this.api.execDeviceCommand(this.id, command);
+            await this.api.execDeviceCommand(commandType, this.id, command);
         } finally {
             this.isCommandRunning = false;
         }

@@ -5,7 +5,15 @@ import {ILog} from 'homebridge/framework';
 import {ITionAuthApi} from './auth';
 import {ILocation} from './state';
 import {ITionPlatformConfig} from 'platform_config';
-import {CommandStatus, CommandType, ICommandResult, IDeviceCommand, IZoneCommand} from './command';
+import {
+    CommandStatus,
+    CommandTarget,
+    CommandType,
+    IBreezerCommand,
+    ICommandResult,
+    IStationCommand,
+    IZoneCommand,
+} from './command';
 
 enum AuthState {
     NoToken = 'no_token',
@@ -16,7 +24,11 @@ enum AuthState {
 export interface ITionApi {
     init(): Promise<any>;
     getSystemState(): Promise<ILocation>;
-    execDeviceCommand(deviceId: string, payload: IDeviceCommand): Promise<ICommandResult>;
+    execDeviceCommand(
+        commandType: CommandType,
+        deviceId: string,
+        payload: IBreezerCommand | IStationCommand
+    ): Promise<ICommandResult>;
     execZoneCommand(zoneId: string, payload: IZoneCommand): Promise<ICommandResult>;
 }
 
@@ -80,33 +92,38 @@ export class TionApi implements ITionApi {
         return this.parseStateResult(stateResult);
     }
 
-    public async execDeviceCommand(deviceId: string, payload: IDeviceCommand): Promise<ICommandResult> {
-        return this.execCommandInternal(deviceId, CommandType.Device, payload);
+    public async execDeviceCommand(
+        commandType: CommandType,
+        deviceId: string,
+        payload: IBreezerCommand | IStationCommand
+    ): Promise<ICommandResult> {
+        return this.execCommandInternal(commandType, CommandTarget.Device, deviceId, payload);
     }
 
     public async execZoneCommand(zoneId: string, payload: IZoneCommand): Promise<ICommandResult> {
-        return this.execCommandInternal(zoneId, CommandType.Zone, payload);
+        return this.execCommandInternal(CommandType.Mode, CommandTarget.Zone, zoneId, payload);
     }
 
     private async execCommandInternal(
-        objectId: string,
-        commandType: CommandType,
-        payload: IDeviceCommand | IZoneCommand
+        type: CommandType,
+        target: CommandTarget,
+        targetId: string,
+        payload: IBreezerCommand | IStationCommand | IZoneCommand
     ): Promise<ICommandResult> {
         this.log.debug(
-            `TionApi.execCommand(objectId = ${objectId}, commandType: ${commandType}, payload = ${JSON.stringify(
+            `TionApi.execCommand(type = ${type}, target: ${target}, targetId = ${targetId}, payload = ${JSON.stringify(
                 payload
             )})`
         );
         this.lastCommandTimestamp = Date.now();
         try {
-            let result: ICommandResult = await this.apiRequest('post', `/${commandType}/${objectId}/mode`, {
+            let result: ICommandResult = await this.apiRequest('post', `/${target}/${targetId}/${type}`, {
                 body: payload,
                 timeout: this.config.apiRequestTimeout,
             });
             const commandId = result.task_id;
             this.log.debug(
-                `TionApi.execCommand(objectId = ${objectId}, commandType: ${commandType}, result = ${JSON.stringify(
+                `TionApi.execCommand(objectId = ${targetId}, commandType: ${target}, result = ${JSON.stringify(
                     result
                 )})`
             );

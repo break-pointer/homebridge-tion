@@ -1,11 +1,13 @@
 import {IHomebridgeAccessory} from 'homebridge/framework';
 import {TionDeviceBase} from './base';
 import {ILocation} from 'tion/state';
+import {CommandType} from '../command';
 
 export class TionMagicAirStation extends TionDeviceBase {
     public co2Level: number = 0;
     public temperature: number = 0;
     public humidity: number = 0;
+    public backlight: boolean = false;
 
     public addEventHandlers(accessory: IHomebridgeAccessory): void {
         accessory.reachable = true;
@@ -40,6 +42,33 @@ export class TionMagicAirStation extends TionDeviceBase {
                 .getCharacteristic(this.characteristicRegistry.CurrentRelativeHumidity)
                 .on('get', callback => this.getState(callback, () => this.humidity));
         }
+
+        const backlightSwitch = accessory.getService(this.serviceRegistry.Switch);
+        if (backlightSwitch) {
+            backlightSwitch
+                .getCharacteristic(this.characteristicRegistry.On)
+                .on('get', callback => this.getState(callback, () => this.backlight))
+                .on('set', async (value, callback) => {
+                    try {
+                        if (!this.isOnline) {
+                            this.log.error(`Device ${this.name} (${this.id}) not reachable`);
+                            return callback('Not reachable');
+                        }
+                        value = Boolean(value);
+                        if (value !== this.backlight) {
+                            await this.setState(CommandType.Settings, {
+                                backlight: value ? 1 : 0,
+                            });
+                        }
+                        this.backlight = value;
+                        callback();
+                    } catch (err) {
+                        this.log.error(err.message || err);
+                        callback(err.message || err);
+                    }
+                });
+        }
+
     }
 
     public updateState(state: ILocation): void {
@@ -67,6 +96,11 @@ export class TionMagicAirStation extends TionDeviceBase {
             if (humiditySensor) {
                 humiditySensor.setCharacteristic(this.characteristicRegistry.CurrentRelativeHumidity, this.humidity);
             }
+
+            const backlightSwitch = accessory.getService(this.serviceRegistry.Switch);
+            if (backlightSwitch) {
+                backlightSwitch.setCharacteristic(this.characteristicRegistry.On, this.backlight);
+            }
         });
     }
 
@@ -80,6 +114,7 @@ export class TionMagicAirStation extends TionDeviceBase {
         this.co2Level = device.data?.co2 || 0;
         this.temperature = device.data?.temperature || 0;
         this.humidity = device.data?.humidity || 0;
+        this.backlight = Boolean(device.data?.backlight);
 
         return true;
     }

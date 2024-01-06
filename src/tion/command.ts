@@ -7,7 +7,7 @@ export enum CommandStatus {
 export interface ICommandResult {
     task_id: string;
     status: CommandStatus;
-    type: 'setDeviceMode';
+    type: 'setDeviceMode' | 'setBrightness';
     target_guid: string;
     user_guid: string;
     email: string;
@@ -25,12 +25,17 @@ export enum GateState {
     Outside4S = 0,
 }
 
-export enum CommandType {
+export enum CommandTarget {
     Device = 'device',
     Zone = 'zone',
 }
 
-export interface IDeviceCommand {
+export enum CommandType {
+    Mode = 'mode',
+    Settings = 'settings',
+}
+
+export interface IBreezerCommand {
     is_on: boolean;
     speed: number;
     speed_min_set: number;
@@ -39,6 +44,10 @@ export interface IDeviceCommand {
     heater_mode?: HeaterMode4S; // new in Tion 4S
     t_set?: number;
     gate?: GateState;
+}
+
+export interface IStationCommand {
+    backlight: 1 | 0;
 }
 
 export enum ZoneMode {
